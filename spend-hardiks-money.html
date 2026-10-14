@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spend Hardik's Money</title>
+<style>
+:root{box-sizing:border-box;--bg:#060b1a;--card:rgba(255,255,255,.06);--bd:rgba(255,255,255,.12);--tx:#f6efdc;--mut:#9aa6c0;--em:#10d98a;--gold:#f5c04a;--red:#ff6b6b;color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:radial-gradient(900px 500px at 20% -10%,#0f3d3a55,transparent),radial-gradient(800px 500px at 90% 0,#5a45102e,transparent),var(--bg);color:var(--tx);font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;min-height:100vh}
+.wrap{max-width:1200px;margin:auto;padding:16px}
+.hero{text-align:center;padding:18px 0 8px}
+h1{margin:0;font-size:clamp(28px,7vw,60px);letter-spacing:2px;font-weight:900;background:linear-gradient(90deg,var(--gold),#fff4c9,var(--em));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 40px #f5c04a33}
+.avatar{display:grid;place-items:center;width:130px;height:130px;margin:0 auto 12px;border-radius:50%;cursor:pointer;overflow:hidden;background:radial-gradient(circle at 30% 25%,#ffffff22,#ffffff08);border:3px dashed var(--gold);box-shadow:0 0 30px #f5c04a44,inset 0 0 20px #10d98a22;transition:.2s}
+.avatar:hover{transform:scale(1.05);box-shadow:0 0 45px #f5c04a88}.avatar.has{border:3px solid var(--gold)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar span{font-size:34px;line-height:1.1;text-align:center}.avatar small{display:block;font-size:11px;color:var(--mut);margin-top:4px}
+.fort{color:var(--mut);margin-top:6px;font-size:clamp(14px,3.5vw,20px)}.fort b{color:var(--gold)}
+.panel{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:14px 0;padding:14px 16px;border-radius:20px;background:rgba(10,18,40,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--bd);box-shadow:0 10px 40px #0008,0 0 30px #10d98a14;transition:box-shadow .3s}
+.panel.glow{box-shadow:0 10px 40px #0008,0 0 45px #10d98a88}.panel.glowg{box-shadow:0 10px 40px #0008,0 0 45px #f5c04a99}
+.rem{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:2px}
+#bal{font-size:clamp(28px,8vw,52px);font-weight:900;color:var(--em);text-shadow:0 0 24px #10d98a55;line-height:1.1;font-variant-numeric:tabular-nums}
+.bar{height:12px;border-radius:9px;background:#ffffff14;overflow:hidden;margin:10px 0 6px}
+#fill{height:100%;width:0;background:linear-gradient(90deg,var(--em),var(--gold));border-radius:9px;transition:width .5s;box-shadow:0 0 14px #f5c04a88}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.pct{font-size:13px;color:var(--mut)}.pct b{color:var(--gold)}
+.tb{display:flex;gap:6px}
+.tb button,.chip,.modal button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;padding:8px 12px;transition:.15s}
+.tb button:hover,.chip:hover{border-color:var(--gold);transform:translateY(-2px)}
+.tb .red:hover{border-color:var(--red)}
+.tools{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+#q{width:100%;padding:12px 16px;border-radius:14px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;outline:none}
+#q:focus{border-color:var(--em);box-shadow:0 0 0 3px #10d98a33}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;border-radius:99px}.chip.on{background:linear-gradient(135deg,var(--em),#0a9b62);color:#04140d;border-color:transparent;font-weight:800}
+#grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:700px){#grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media(min-width:1000px){#grid{grid-template-columns:repeat(4,1fr)}}
+.card{position:relative;padding:14px 12px;border-radius:20px;background:var(--card);border:1px solid var(--bd);backdrop-filter:blur(8px);text-align:center;transition:.2s;box-shadow:0 6px 20px #0005}
+.card:hover{transform:translateY(-4px);border-color:#f5c04a66;box-shadow:0 12px 30px #0007,0 0 24px #f5c04a22}
+.card.own{border-color:#10d98a66}
+.ic{font-size:44px;line-height:1;width:74px;height:74px;margin:0 auto 8px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 30% 25%,#ffffff26,#ffffff08);box-shadow:inset 0 0 20px #f5c04a1a,0 0 20px #10d98a1a}
+.nm{font-weight:800;font-size:15px;min-height:38px;display:grid;place-items:center}
+.pr{color:var(--gold);font-weight:900;font-size:17px;margin:2px 0 8px}
+.ctl{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.ctl button{font:inherit;font-weight:900;font-size:12px;border:0;border-radius:11px;padding:10px 8px;cursor:pointer;flex:1;transition:transform .1s,filter .2s}
+.b{background:linear-gradient(135deg,var(--em),#0fa66a);color:#03130c;box-shadow:0 4px 14px #10d98a44}
+.s{background:transparent;color:var(--red);border:1.5px solid #ff6b6b88!important}
+.ctl button:active{transform:scale(.88)}.ctl button:disabled{opacity:.28;cursor:not-allowed;filter:grayscale(.6)}
+.qty{min-width:44px;font-weight:900;font-size:18px;font-variant-numeric:tabular-nums}
+.mx{font-size:11px;color:var(--mut);margin-top:7px;cursor:pointer;background:none;border:0;font-family:inherit;text-decoration:underline;text-decoration-color:#ffffff33}.mx:hover{color:var(--gold)}
+.sp{font-size:12px;color:var(--mut);margin-top:6px;min-height:15px}.sp b{color:var(--em)}
+.fl{position:fixed;pointer-events:none;font-weight:900;font-size:20px;z-index:99;animation:up 1.1s ease-out forwards;text-shadow:0 2px 10px #000}
+@keyframes up{to{transform:translateY(-90px);opacity:0}}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);transform:translateX(-50%);z-index:120;padding:12px 18px;border-radius:16px;background:linear-gradient(135deg,#2a2107,#0b2a20);border:1px solid var(--gold);color:var(--gold);font-weight:800;text-align:center;box-shadow:0 0 40px #f5c04a66;max-width:92vw;animation:tin .4s,tout .5s 3.2s forwards}
+.toast.fun{border-color:var(--em);color:var(--tx);font-weight:600;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);animation:tin .3s,tout .4s 2.4s forwards}
+@keyframes tin{from{opacity:0;transform:translate(-50%,-20px) scale(.9)}}@keyframes tout{to{opacity:0}}
+.pop{position:fixed;font-size:26px;z-index:99;pointer-events:none;animation:pp 1.6s ease-out forwards}
+@keyframes pp{to{transform:translate(var(--x),var(--y)) rotate(360deg);opacity:0}}
+.ov{position:fixed;inset:0;background:#000b;z-index:150;display:none;place-items:center;padding:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}.ov.on{display:grid}
+.modal{background:#0b1430;border:1px solid var(--gold);border-radius:24px;padding:22px;max-width:460px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 0 60px #f5c04a33}
+.modal h2{margin:0 0 12px;color:var(--gold)}
+.st{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #ffffff12;gap:10px}.st b{color:var(--em);text-align:right}
+.modal .go{background:linear-gradient(135deg,var(--em),#0a9b62);color:#04140d;font-weight:800;border:0}
+.modal .no{background:linear-gradient(135deg,#ff6b6b,#c93a3a);color:#fff;font-weight:800;border:0}
+.mb{display:flex;gap:10px;margin-top:16px}.mb button{flex:1;padding:12px}
+#none{display:none;text-align:center;color:var(--mut);padding:40px}
+</style></head><body>
+<div class="wrap">
+<div class="hero">
+<!-- HARDIK'S PHOTO: set PHOTO_URL in the script below, or tap the frame to pick a picture -->
+<label class="avatar" id="av" title="Tap to add Hardik's photo"><img id="hp" alt="Hardik" hidden><span id="ph">📸<small>Hardik's photo<br>goes here</small></span><input type="file" id="pf" accept="image/*" hidden></label>
+<h1>SPEND HARDIK’S MONEY</h1>
+<div class="fort">Your Fortune: <b>₹10,00,000 Crore</b></div></div>
+<div class="panel" id="panel">
+<div class="row"><div><div class="rem">Remaining</div><div id="bal">₹10,00,000 Crore</div></div>
+<div class="tb"><button id="sum">📊 Summary</button><button id="snd" title="Sound">🔊</button><button id="rst" class="red">↺ Reset</button></div></div>
+<div class="bar"><div id="fill"></div></div>
+<div class="pct">Spent <b id="pc">0%</b> · <span id="sp">₹0</span> · <span id="ct">0</span> items</div></div>
+<div class="tools"><input id="q" type="search" placeholder="🔍 Search for anything to waste money on…">
+<div class="chips" id="chips"></div></div>
+<div id="grid"></div><div id="none">Nothing found. Even Hardik can't buy that. 🤷</div>
+</div>
+<div class="ov" id="ovS"><div class="modal"><h2>💸 Spending Report</h2><div id="sb"></div><div class="mb"><button class="go" onclick="ovS.classList.remove('on')">Keep Spending</button></div></div></div>
+<div class="ov" id="ovR"><div class="modal"><h2>Reset the game?</h2><p style="color:var(--mut)">All purchases will be undone and Hardik's fortune restored to ₹10,00,000 Crore.</p><div class="mb"><button onclick="ovR.classList.remove('on')">Cancel</button><button class="no" id="yes">Yes, reset</button></div></div></div>
+<script>
+const TOTAL=1e13,CATS={F:'Food',T:'Tech',G:'Gaming',C:'Cars',L:'Luxury',V:'Travel',R:'Real Estate',S:'Sports',E:'Entertainment',B:'Businesses',Z:'Crazy'};
+const RAW=`F|🍫|Chocolate|20
+F|🍦|Ice Cream Cone|60
+F|🥟|Samosa|50
+F|☕|Chai|100
+F|🍔|Burger Combo|250
+F|🍛|Biryani|350
+F|🍕|Pizza|500
+F|🥭|Alphonso Mango Crate|1500
+F|🍰|Wedding Cake|25000
+F|🍽️|Fine Dining Dinner|40000
+F|🧀|Golden Dosa Cart|2e6
+G|🎮|Gaming Console|10000
+G|🥽|VR Headset Setup|60000
+G|🖥️|Gaming PC|1e5
+G|🕹️|Arcade Machine|3e5
+G|🏆|Esports Team|5e7
+G|🎲|Game Studio|2e9
+G|🏟️|Esports Arena|3e9
+T|📱|Smartphone|5000
+T|🎧|Headphones|8000
+T|⌚|Smartwatch|15000
+T|📲|Premium Phone|25000
+T|💻|Laptop|50000
+T|📷|Pro Camera|2e5
+T|🤖|Home Robot|8e5
+T|🖥️|Server Rack|5e6
+T|📡|Satellite|5e9
+T|🧠|AI Supercomputer|3e10
+T|🚀|Rocket Launch|2e10
+C|🛺|Auto Rickshaw|1.5e5
+C|🏍️|Motorcycle|2e5
+C|🚜|Tractor|8e5
+C|🚗|Car|1e6
+C|🚙|Premium Car|2.5e6
+C|🚘|Luxury Car|5e6
+C|🏎️|Supercar|5e7
+C|🚁|Helicopter|6e8
+C|🚌|Bus Fleet|2e8
+C|🚄|Bullet Train|5e10
+L|👟|Sneakers|1000
+L|🧥|Designer Suit|1e5
+L|👜|Designer Handbag|3e5
+L|⌚|Luxury Watch|5e5
+L|🪙|Gold Bar Stack|1e7
+L|💎|Diamond Necklace|2e7
+L|👑|Gold Crown|1.5e8
+L|🏺|Antique Vase|1e8
+L|🖼️|Famous Painting|5e9
+L|💠|Pink Diamond|8e9
+V|🎫|Flight Ticket|6000
+V|🏨|Luxury Hotel Stay|50000
+V|🌍|World Tour|5e6
+V|✈️|Private Jet|5e7
+V|🛥️|Luxury Yacht|1e8
+V|🏝️|Private Island|2.5e8
+V|🚀|Space Vacation|2.5e8
+V|🚢|Cruise Ship|1.5e10
+R|🏡|1BHK Flat|5e6
+R|🏠|Mansion|1e7
+R|🌾|Farmhouse|2e7
+R|🏘️|Gated Society|1e9
+R|🏢|Skyscraper|5e8
+R|🏰|Palace|2.5e9
+R|🏬|Shopping Mall|7.5e9
+R|🏙️|Entire City Block|2e11
+R|🌆|Whole Township|1e12
+S|⚽|Football|2000
+S|🏏|Cricket Bat (Signed)|5000
+S|🏀|Basketball Court|2e6
+S|🎾|Tennis Academy|2e7
+S|🏟️|Stadium|1e9
+S|🏏|IPL Team|1e10
+S|🏎️|Formula 1 Team|3e10
+S|🥇|Host the Olympics|1e12
+E|🎸|Guitar|30000
+E|🎆|Grand Fireworks Show|5e6
+E|💃|Bollywood Item Song|5e7
+E|🎤|World Concert Tour|5e8
+E|🎥|Blockbuster Film|3e9
+E|🎬|Movie Studio|5e9
+E|🎵|Music Label|8e9
+E|📺|TV Channel|2e10
+E|🎭|Streaming Platform|2e11
+B|🏪|Kirana Store|5e5
+B|✈️|Airline|1e10
+B|🏢|Major Company|5e10
+B|🏭|Mega Corporation|1e11
+B|🛢️|Oil Refinery|2.5e11
+B|🏦|Private Bank|5e11
+B|📞|Telecom Giant|1e12
+B|🛒|E-commerce Empire|2e12
+B|⚡|National Power Grid|3e12
+Z|🪁|Sky Full of Kites|1e6
+Z|🥘|Lifetime of Golgappe|1e5
+Z|🐘|Royal Elephant|2.5e6
+Z|🐯|Pet Tiger|5e6
+Z|🎇|Diwali Crackers Factory|5e7
+Z|🧞|Wish-Granting Genie|1e8
+Z|🦄|Actual Unicorn|1e9
+Z|🗿|Giant Statue Replica|3e10
+Z|🛸|Friendly UFO|8e10
+Z|🏔️|Mount Everest|1e11
+Z|🕰️|Time Machine|2e12
+Z|🤴|Your Own Kingdom|1.5e12
+Z|🌕|The Moon|5e12
+Z|🪐|A Small Planet|8e12`;
+const IT=RAW.split('\n').map(l=>{const a=l.split('|');return{c:a[0],e:a[1],n:a[2],p:+a[3]}}).sort((a,b)=>a.p-b.p).map((x,i)=>(x.i=i,x));
+let Q={},bal=TOTAL,shown=TOTAL,mute=false,cat='ALL',mile={};
+try{const s=JSON.parse(localStorage.getItem('shm'));if(s&&s.Q){Q=s.Q;mile=s.m||{}}}catch(e){}
+const $=id=>document.getElementById(id);
+const nf=(v,d=2)=>v.toLocaleString('en-IN',{maximumFractionDigits:d});
+const fm=v=>v>=1e7-1?'₹'+nf(v/1e7)+' Crore':'₹'+nf(Math.round(v),0);
+const spent=()=>IT.reduce((s,x)=>s+(Q[x.i]||0)*x.p,0);
+function recalc(){bal=TOTAL-spent()}
+function save(){try{localStorage.setItem('shm',JSON.stringify({Q,m:mile}))}catch(e){}}
+let ac;function beep(f,d=.08,t='sine'){if(mute)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function count(){const from=shown,to=bal,t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/450),e=1-Math.pow(1-k,3);shown=from+(to-from)*e;$('bal').textContent=fm(k<1?shown:to);if(k<1)requestAnimationFrame(f)})(t0)}
+function flt(txt,col,el){const r=el.getBoundingClientRect(),d=document.createElement('div');d.className='fl';d.textContent=txt;d.style.color=col;d.style.left=(r.left+r.width/2-40)+'px';d.style.top=r.top+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1100)}
+function toast(t,cls=''){const d=document.createElement('div');d.className='toast '+cls;d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),cls?2900:3700)}
+function burst(){['🎉','✨','💰','🪙','🎊'].forEach((e,i)=>{for(let k=0;k<4;k++){const d=document.createElement('div');d.className='pop';d.textContent=e;d.style.left='50%';d.style.top='40%';d.style.setProperty('--x',(Math.random()*500-250)+'px');d.style.setProperty('--y',(Math.random()*400-200)+'px');document.body.appendChild(d);setTimeout(()=>d.remove(),1600)}})}
+const MS=[[1e7,'₹1 Crore spent!'],[1e9,'₹100 Crore spent — Bollywood-level spending!'],[1e10,'₹1,000 Crore spent — Unicorn territory!'],[1e11,'₹10,000 Crore spent — Nation-level shopping!'],[1e12,'₹1 Lakh Crore spent — Legendary!'],[5e12,'₹5 Lakh Crore spent — Half the fortune gone!'],[1e13,'EVERY RUPEE SPENT. Hardik is broke. 🏆']];
+function checkMS(){const s=TOTAL-bal;MS.forEach(([v,m])=>{if(s>=v&&!mile[v]){mile[v]=1;toast('🏆 '+m);burst();beep(880,.3);setTimeout(()=>beep(1320,.4),150)}})}
+const FUN=[[10,'Ten already? Someone’s enjoying this.'],[100,'100 of them? Hardik’s accountant just fainted.'],[1000,'1,000. Hardik now needs a warehouse.'],[10000,'10,000. Hope you’re hungry — or storing them in a museum.'],[100000,'100,000! Purely reckless. We respect it.']];
+function fun(x,q){const f=FUN.find(a=>a[0]===q);if(f)toast(x.e+' '+(x.n==='Samosa'&&q===10000?"You just bought 10,000 samosas. Hope you're hungry.":f[1]),'fun');else if(x.p>=1e12&&q===1)toast(x.e+' You bought the '+x.n+'. Bold.','fun')}
+function upd(x){const c=$('c'+x.i),q=Q[x.i]||0;c.querySelector('.qty').textContent=nf(q,0);c.querySelector('.sp').innerHTML=q?'Spent <b>'+fm(q*x.p)+'</b>':'';c.classList.toggle('own',q>0);c.querySelector('.s').disabled=!q;c.querySelector('.b').disabled=bal<x.p}
+function refresh(){const s=TOTAL-bal,n=Object.values(Q).reduce((a,b)=>a+b,0);$('fill').style.width=Math.min(100,s/TOTAL*100)+'%';$('pc').textContent=nf(s/TOTAL*100,4)+'%';$('sp').textContent=fm(s);$('ct').textContent=nf(n,0);IT.forEach(upd)}
+function buy(x,n,btn){n=Math.min(n,Math.floor(bal/x.p+1e-9));if(n<1){beep(140,.15,'square');return}Q[x.i]=(Q[x.i]||0)+n;recalc();count();flt('−'+fm(n*x.p),'#ff8f8f',btn);$('panel').classList.add('glow');setTimeout(()=>$('panel').classList.remove('glow'),300);beep(520+Math.random()*120);refresh();fun(x,Q[x.i]);checkMS();save()}
+function sell(x,btn){if(!Q[x.i])return;Q[x.i]--;recalc();count();flt('+'+fm(x.p),'#10d98a',btn);$('panel').classList.add('glowg');setTimeout(()=>$('panel').classList.remove('glowg'),300);beep(330,.1,'triangle');refresh();save()}
+const G=$('grid');
+G.innerHTML=IT.map(x=>`<div class="card" id="c${x.i}" data-c="${x.c}" data-n="${x.n.toLowerCase()}"><div class="ic">${x.e}</div><div class="nm">${x.n}</div><div class="pr">${fm(x.p)}</div><div class="ctl"><button class="s">− SELL</button><span class="qty">0</span><button class="b">BUY +</button></div><button class="mx">Buy max</button><div class="sp"></div></div>`).join('');
+IT.forEach(x=>{const c=$('c'+x.i),b=c.querySelector('.b');b.onclick=()=>buy(x,1,b);c.querySelector('.s').onclick=e=>sell(x,e.currentTarget);c.querySelector('.mx').onclick=()=>buy(x,1e15,b);
+let t,iv;b.onpointerdown=()=>{t=setTimeout(()=>{iv=setInterval(()=>buy(x,1,b),90)},350)};['pointerup','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>{clearTimeout(t);clearInterval(iv)}))});
+$('chips').innerHTML=[['ALL','All'],...Object.entries(CATS)].map(([k,v])=>`<button class="chip${k==='ALL'?' on':''}" data-k="${k}">${v==='Crazy'?'🤪 Crazy':v}</button>`).join('');
+$('chips').onclick=e=>{const k=e.target.dataset.k;if(!k)return;cat=k;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k));filt();beep(700,.05)};
+function filt(){const s=$('q').value.trim().toLowerCase();let v=0;IT.forEach(x=>{const c=$('c'+x.i),ok=(cat==='ALL'||x.c===cat)&&x.n.toLowerCase().includes(s);c.style.display=ok?'':'none';if(ok)v++});$('none').style.display=v?'none':'block'}
+$('q').oninput=filt;
+$('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊'};
+$('sum').onclick=()=>{const s=TOTAL-bal,n=Object.values(Q).reduce((a,b)=>a+b,0),own=IT.filter(x=>Q[x.i]),cs={};own.forEach(x=>cs[x.c]=(cs[x.c]||0)+Q[x.i]*x.p);
+const top=[...own].sort((a,b)=>Q[b.i]*b.p-Q[a.i]*a.p).slice(0,3),pri=own.length?own[own.length-1]:null,fc=Object.entries(cs).sort((a,b)=>b[1]-a[1])[0];
+const r=(a,b)=>`<div class="st"><span>${a}</span><b>${b}</b></div>`;
+$('sb').innerHTML=r('Total spent',fm(s))+r('Remaining',fm(bal))+r('Fortune spent',nf(s/TOTAL*100,4)+'%')+r('Items purchased',nf(n,0))+r('Unique items',own.length+' of '+IT.length)+r('Priciest item',pri?pri.e+' '+pri.n:'—')+r('Favourite category',fc?CATS[fc[0]]:'—')+r('Top spends',top.length?top.map(x=>x.e+' '+x.n+' ×'+nf(Q[x.i],0)).join('<br>'):'—');
+$('ovS').classList.add('on')};
+$('rst').onclick=()=>$('ovR').classList.add('on');
+$('yes').onclick=()=>{Q={};mile={};recalc();count();refresh();save();$('ovR').classList.remove('on');toast('Fortune restored to ₹10,00,000 Crore 💰','fun');beep(660,.2)};
+[$('ovS'),$('ovR')].forEach(o=>o.onclick=e=>{if(e.target===o)o.classList.remove('on')});
+const PHOTO_URL=''; // paste an image URL or data: URI of Hardik here
+function setPhoto(u){if(!u)return;$('hp').src=u;$('hp').hidden=false;$('ph').hidden=true;$('av').classList.add('has')}
+setPhoto(PHOTO_URL);
+$('pf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>setPhoto(r.result);r.readAsDataURL(f)};
+recalc();shown=bal;$('bal').textContent=fm(bal);refresh();
+</script></body></html>

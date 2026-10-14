@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Build a Country</title>
+<style>
+:root{--bg:#07121f;--pn:#0f2236;--ln:#1f3d5c;--fg:#eaf4ff;--mu:#7fa0bf;--ac:#ffc94a;--gr:#3ddc97;--rd:#ff6b6b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07121f}}
+:root[data-theme="dark"]{--bg:#07121f}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:"Trebuchet MS",Verdana,sans-serif;font-size:13px;overscroll-behavior:none;touch-action:none;user-select:none;-webkit-user-select:none}
+#app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+#hud{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;background:var(--pn);border-bottom:2px solid var(--ln)}
+#hud div{background:#0a1a2b;border-radius:6px;padding:3px 5px;text-align:center;line-height:1.25}
+#hud b{display:block;font-size:13px}#hud small{color:var(--mu);font-size:10px}
+#st{display:flex;justify-content:space-between;padding:4px 8px;color:var(--mu);font-size:12px}
+#map{flex:1;position:relative;min-height:0}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+#zm{position:absolute;right:6px;top:6px;display:flex;flex-direction:column;gap:4px}
+#zm button{width:34px;height:34px;border-radius:8px;border:1px solid var(--ln);background:#0f2236cc;color:var(--fg);font-size:18px}
+#toast{position:absolute;left:0;right:0;top:8px;text-align:center;font-weight:bold;pointer-events:none;text-shadow:0 1px 4px #000;transition:opacity .4s}
+#bar{display:flex;gap:5px;overflow-x:auto;padding:6px;background:var(--pn);border-top:2px solid var(--ln);touch-action:pan-x}
+#bar button{flex:0 0 auto;min-width:60px;padding:4px 6px;border-radius:8px;border:1px solid var(--ln);background:#0a1a2b;color:var(--fg);font:inherit;font-size:11px;line-height:1.2}
+#bar button.a{border-color:var(--ac);background:#3a2f0e}#bar button[disabled]{opacity:.35}
+#bar i{display:block;font-style:normal;font-size:18px}
+#ctl{display:flex;gap:6px;padding:6px}
+#ctl button{padding:11px;border-radius:9px;border:0;font:inherit;font-weight:bold;font-size:14px}
+#nt{flex:3;background:var(--ac);color:#241a00}#au,#go{flex:1;background:var(--ln);color:var(--fg)}#au.on{background:var(--gr);color:#002}
+#md{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:9;touch-action:auto}
+#mb{background:var(--pn);border:2px solid var(--ac);border-radius:14px;padding:16px;max-width:400px;width:100%;max-height:90%;overflow:auto}
+#mb h2{margin:0 0 6px;font-size:20px}#mb p{color:var(--mu);margin:0 0 10px}
+#mb button{display:block;width:100%;margin:6px 0;padding:11px;border-radius:9px;border:1px solid var(--ac);background:#0a1a2b;color:var(--fg);font:inherit;text-align:left}
+#mb button small{display:block;color:var(--mu);margin-top:2px}#mb button[disabled]{opacity:.35}
+.pb{height:8px;background:var(--ln);border-radius:4px;margin:3px 0 10px}.pb i{display:block;height:100%;border-radius:4px;background:var(--gr)}
+</style></head><body>
+<div id="app"><div id="hud"></div><div id="st"></div>
+<div id="map"><canvas id="c"></canvas><div id="zm"><button id="zi">+</button><button id="zo">−</button></div><div id="toast"></div></div>
+<div id="bar"></div>
+<div id="ctl"><button id="go">🏆</button><button id="au">Auto</button><button id="nt">NEXT TURN ▶</button></div></div>
+<div id="md"><div id="mb"></div></div>
+<script>
+const $=id=>document.getElementById(id),cv=$('c'),x=cv.getContext('2d'),N=12;
+const B={
+road:{e:'🛣️',n:'Road',c:500,col:'#4a4f58',h:1,up:8},
+house:{e:'🏠',n:'House',c:5000,col:'#e8b04a',h:12,up:30,cap:200},
+shop:{e:'🏪',n:'Shop',c:12000,col:'#e2587a',h:14,up:60,rev:600,dm:6,jobs:60},
+factory:{e:'🏭',n:'Factory',c:25000,col:'#8b7fb8',h:18,up:200,rev:1500,dm:6,jobs:200,pol:1.2},
+coal:{e:'⚡',n:'Coal plant',c:20000,col:'#5a5a64',h:20,up:250,pw:60,pol:1.8,jobs:40},
+solar:{e:'☀️',n:'Solar farm',c:40000,col:'#2b6fd6',h:3,up:60,pw:30,pol:-.2},
+school:{e:'🏫',n:'School',c:30000,col:'#f0d24a',h:20,up:250,dm:6,jobs:30},
+hosp:{e:'🏥',n:'Hospital',c:40000,col:'#f2f2f2',h:24,up:350,dm:6,jobs:50},
+park:{e:'🌳',n:'Park',c:6000,col:'#2fbf5a',h:2,up:40,pol:-1},
+tower:{e:'🏢',n:'Tower',c:40000,col:'#5ec8e8',h:42,up:150,cap:800,dm:6,rq:'Tech 25',ok:s=>s.tech>=25},
+airport:{e:'✈️',n:'Airport',c:150000,col:'#9aa4b0',h:3,up:1200,rev:3000,dm:8,jobs:300,pol:1,rq:'City',ok:s=>s.stg>=2},
+uw:{e:'🌊',n:'Sea city',c:8e5,col:'#2fb7c9',h:16,up:900,cap:1500,rev:4000,dm:8,jobs:200,sea:1,rq:'Country',ok:s=>s.stg>=4},
+station:{e:'🛰️',n:'Station',c:2e6,col:'#c8d0e0',h:20,up:1500,cap:1000,rev:6000,dm:8,jobs:150,sea:1,rq:'Global Power',ok:s=>s.stg>=5},
+moon:{e:'🌙',n:'Moon base',c:5e6,col:'#b8b8c8',h:16,up:2500,cap:2500,rev:9000,dm:8,jobs:300,sea:1,rq:'Global+Tech 75',ok:s=>s.stg>=5&&s.tech>=75},
+mars:{e:'🔴',n:'Mars colony',c:15e6,col:'#d8583a',h:22,up:4000,cap:5000,rev:15000,dm:8,jobs:500,sea:1,rq:'Global+Tech 85',ok:s=>s.stg>=5&&s.tech>=85}};
+const SG=['Village','Town','City','State','Country','Global Power','Space Civilization 🚀'],SP=[0,2500,7000,15000,30000,60000],STH=[0,0,0,25,45,70];
+const EVT=[
+{e:'💰',n:'Economic boom',t:'Trade is booming. What do you do with the windfall?',c:[['Bank it',{m:40000,eco:3}],['Tax holiday',{m:-5000,h:8,eco:6}]]},
+{e:'📉',n:'Recession',t:'Markets are falling and shops are quiet.',c:[['Austerity',{h:-8,eco:-3,rec:5}],['Stimulus package',{m:-30000,h:2,rec:2}]]},
+{e:'🌪️',n:'Natural disaster',t:'A huge storm hits your country!',c:[['Emergency rebuild fund',{m:-25000,kill:1}],['Evacuate and recover slowly',{kill:3,pop:-.05,h:-4}]]},
+{e:'🚀',n:'Technology breakthrough',t:'Your scientists made a discovery.',c:[['Fund R&D',{m:-40000,tech:15}],['License it abroad',{m:40000,tech:4}]]},
+{e:'🛢️',n:'Oil discovery',t:'Oil was found under your land.',c:[['Drill!',{m:120000,env:-12,eco:4}],['Protect the land',{env:5,h:4,tech:2}]]},
+{e:'☀️',n:'Energy crisis',t:'Power is running short.',c:[['Buy emergency power',{m:-30000}],['Ration electricity',{en:-30,h:-4,eco:-3}]]},
+{e:'👽',n:'Strange discovery',t:'An alien artifact was found in the hills.',c:[['Study it',{m:-20000,tech:10,h:-3}],['Open to tourists',{m:60000,h:5,env:-3}],['Bury it',{h:2}]]},
+{e:'🏆',n:'International event',t:'The world wants to hold a summit in your country.',c:[['Host the games',{m:-60000,h:10,eco:8}],['Send a small team',{h:2}]]},
+{e:'🤖',n:'AI revolution',t:'AI is changing every industry.',c:[['Embrace AI',{tech:15,eco:8,h:-8}],['Regulate it',{tech:5,h:3,eco:1}]]}];
+const GO=[['💰 Richest country','Reach ₹50 L cash',s=>s.cash>=5e6,s=>s.cash/5e6],['😊 Happiest country','Happiness 90+ with 15k people',s=>s.hap>=90&&s.pop>=15000,s=>Math.min(s.hap/90,s.pop/15000)],
+['🤖 Most advanced','Technology 100',s=>s.tech>=100,s=>s.tech/100],['🌱 Greenest country','Environment 90+ with 15k people',s=>s.env>=90&&s.pop>=15000,s=>Math.min(s.env/90,s.pop/15000)],
+['🗺️ Largest country','Full territory, 100+ tiles built',s=>s.lvl>=4&&built(s)>=100,s=>Math.min(1,(s.lvl/4+built(s)/100)/2)],['🚀 Space civilization','Reach the final stage',s=>s.stg>=6,s=>s.stg/6]];
+let st,tool='road',cam={x:0,y:0,z:1},W=300,H=300,dpr=1,fr=0,cars=[],pa=[],rain=[],auto=null,down=null,sh=0,toastT=0;
+const lo=(n,a,b)=>Math.max(a,Math.min(b,n)),built=s=>s.grid.filter(Boolean).length,ix=(i,j)=>j*N+i;
+const off=()=>(N-(4+2*st.lvl))/2,unl=(i,j)=>{const o=off(),u=4+2*st.lvl;return i>=o&&i<o+u&&j>=o&&j<o+u};
+function fresh(){const s={cash:100000,pop:1000,hap:72,eco:50,tech:12,env:85,en:70,turn:1,lvl:0,stg:0,grid:Array(N*N).fill(null),ev:null,enMod:0,rec:0,net:0,won:{},rain:0,last:0};
+ const put=(i,j,t)=>s.grid[ix(i,j)]={t,a:1};for(let i=4;i<8;i++)put(i,5,'road');[4,5,6,7].forEach(i=>put(i,4,'house'));put(4,6,'house');put(5,6,'house');put(6,6,'coal');put(7,6,'shop');return s}
+try{st=JSON.parse(localStorage.getItem('buildcountry')||'null')}catch(e){}
+if(!st||!st.grid||st.grid.length!==N*N)st=fresh();
+function save(){try{localStorage.setItem('buildcountry',JSON.stringify(st))}catch(e){}}
+const f$=n=>{const a=Math.abs(Math.round(n)),g=a>=1e7?+(a/1e7).toFixed(2)+' Cr':a>=1e5?+(a/1e5).toFixed(2)+' L':a.toLocaleString('en-IN');return(n<0?'-':'')+'₹'+g};
+function say(m){$('toast').textContent=m;$('toast').style.opacity=1;toastT=fr}
+function conn(i,j){return[[1,0],[-1,0],[0,1],[0,-1]].some(d=>{const b=st.grid[ix(i+d[0],j+d[1])];return i+d[0]>=0&&j+d[1]>=0&&i+d[0]<N&&j+d[1]<N&&b&&b.t==='road'})}
+function calc(){let cap=0,jobs=0,rev=0,up=0,pw=0,dm=0,pol=0,sch=0,hos=0,par=0;
+ for(let j=0;j<N;j++)for(let i=0;i<N;i++){const b=st.grid[ix(i,j)];if(!b)continue;const d=B[b.t],m=(b.t==='road'||d.sea||conn(i,j))?1:.5;
+  cap+=(d.cap||0)*m*(1+st.tech/200);jobs+=(d.jobs||0)*m;rev+=(d.rev||0)*m;up+=d.up;pw+=(d.pw||0)*(1+st.tech/100);dm+=d.dm||0;pol+=d.pol||0;if(b.t==='school')sch++;if(b.t==='hosp')hos++;if(b.t==='park')par++}
+ return{cap,jobs,rev,up,pw,dm:dm+st.pop/150,pol,sch,hos,par}}
+function turn(){
+ const c=calc();st.en=lo(100*(c.pw+st.enMod)/Math.max(1,c.dm),0,100);st.enMod*=.85;
+ const unemp=lo(1-c.jobs/Math.max(1,st.pop*.4),0,1);
+ const et=lo(25+c.rev/400+st.tech*.2-(st.rec>0?25:0),0,100);st.eco+=(et-st.eco)*.25;
+ const ht=55+Math.min(12,c.hos*4)+Math.min(10,c.par*3)+Math.min(8,c.sch*3)-(st.en<60?(60-st.en)*.4:0)-(st.env<40?(40-st.env)*.4:0)-unemp*20+(st.en>=90?4:0);
+ st.hap+=(lo(ht,0,100)-st.hap)*.2;
+ const gr=.09*(st.hap/70)+c.hos*.004;st.pop+=c.cap>st.pop?(c.cap-st.pop)*gr:(c.cap-st.pop)*.05;st.pop=Math.max(50,st.pop);
+ const rv=(st.pop*1.6*(st.eco/50)+c.rev)*(1+st.tech/150)*(st.en<50?.7:1)*(st.rec>0?.75:1);
+ st.net=rv-c.up;st.cash+=st.net;if(st.rec>0)st.rec--;
+ st.env=lo(st.env-c.pol+.3,0,100);st.tech=lo(st.tech+c.sch*.6,0,100);
+ st.turn++;st.rain=Math.random()<.25?1:0;
+ let s=0;for(let i=1;i<6;i++)if(st.pop>=SP[i]&&st.tech>=STH[i])s=i;if(st.grid.some(b=>b&&b.t==='mars')||st.pop>=150000)s=6;
+ if(s>st.stg){st.stg=s;say('🎉 Your land is now a '+SG[s]+'!')}
+ GO.forEach((g,k)=>{if(!st.won[k]&&g[2](st)){st.won[k]=1;if(!st.ev)modal('<h2>🏆 Victory: '+g[0]+'</h2><p>'+g[1]+'. There are other ways to win — keep going!</p><button onclick="cm()">Continue</button>')}});
+ if(!st.ev&&st.turn>2&&Math.random()<.4)st.ev=Math.floor(Math.random()*EVT.length);
+ hud();if(st.ev!=null)evModal();save()}
+function fxT(f){const p=[];if(f.m)p.push('💰 '+(f.m>0?'+':'')+f$(f.m));if(f.h)p.push('😊 '+(f.h>0?'+':'')+f.h);if(f.eco)p.push('📈 '+(f.eco>0?'+':'')+f.eco);if(f.tech)p.push('🔬 +'+f.tech);if(f.env)p.push('🌿 '+(f.env>0?'+':'')+f.env);if(f.kill)p.push('💥 lose '+f.kill+' building'+(f.kill>1?'s':''));if(f.pop)p.push('👥 '+Math.round(f.pop*100)+'%');if(f.en)p.push('⚡ '+f.en);if(f.rec)p.push('📉 slump '+f.rec+' turns');return p.join('  ')||'No change'}
+function evModal(){const e=EVT[st.ev];modal('<h2>'+e.e+' '+e.n+'</h2><p>'+e.t+'</p>'+e.c.map((c,i)=>'<button data-c="'+i+'" '+(c[1].m<0&&st.cash+c[1].m<0?'disabled':'')+'>'+c[0]+'<small>'+fxT(c[1])+'</small></button>').join(''))}
+function choose(i){const f=EVT[st.ev].c[i][1];st.ev=null;cm();
+ if(f.m)st.cash+=f.m;if(f.h)st.hap=lo(st.hap+f.h,0,100);if(f.eco)st.eco=lo(st.eco+f.eco,0,100);if(f.tech)st.tech=lo(st.tech+f.tech,0,100);if(f.env)st.env=lo(st.env+f.env,0,100);if(f.pop)st.pop=Math.max(50,st.pop*(1+f.pop));if(f.en)st.enMod+=f.en;if(f.rec)st.rec=f.rec;
+ if(f.kill){sh=14;for(let k=0;k<f.kill;k++){const l=[];st.grid.forEach((b,q)=>{if(b&&b.t!=='road')l.push(q)});if(l.length){const q=l[Math.floor(Math.random()*l.length)];dust(q%N,Math.floor(q/N),20);st.grid[q]=null}}}
+ hud();save()}
+function modal(h){$('mb').innerHTML=h;$('md').style.display='flex'}function cm(){$('md').style.display='none'}
+function hud(){const s=st,sn=[['💰','Money',f$(s.cash)],['👥','People',Math.round(s.pop).toLocaleString('en-IN')],['😊','Happy',Math.round(s.hap)+'%'],['📈','Economy',Math.round(s.eco)],['🔬','Tech',Math.round(s.tech)],['🌿','Environ.',Math.round(s.env)],['⚡','Energy',Math.round(s.en)+'%'],['📅','Turn',s.turn]];
+ $('hud').innerHTML=sn.map(a=>'<div><small>'+a[0]+' '+a[1]+'</small><b>'+a[2]+'</b></div>').join('');
+ $('st').innerHTML='<span>🏝️ '+SG[s.stg]+'</span><span>'+(s.net>=0?'+':'')+f$(s.net)+' / turn · Year '+(2030+Math.floor((s.turn-1)/12))+'</span>';bar()}
+function bar(){const keys=Object.keys(B);$('bar').innerHTML=keys.map(k=>{const d=B[k],lk=d.ok&&!d.ok(st);return'<button data-t="'+k+'" class="'+(tool===k?'a':'')+'" '+(lk?'disabled':'')+'><i>'+d.e+'</i>'+d.n+'<br>'+(lk?'🔒 '+d.rq:f$(d.c))+'</button>'}).join('')
+ +'<button data-t="dozer" class="'+(tool==='dozer'?'a':'')+'"><i>🧨</i>Bulldoze<br>refund 40%</button><button data-t="expand"><i>🌍</i>Expand<br>'+(st.lvl<4?f$([5e4,15e4,4e5,1e6][st.lvl]):'MAX')+'</button>'}
+function place(i,j){if(i<0||j<0||i>=N||j>=N)return;const q=ix(i,j),b=st.grid[q];
+ if(tool==='dozer'){if(b){st.cash+=B[b.t].c*.4;st.grid[q]=null;dust(i,j,10);hud()}return}
+ const d=B[tool];if(!d||b)return;if(d.sea?unl(i,j):!unl(i,j)){say(d.sea?'Build this on the open sea/space':'Outside your territory');return}
+ if(d.ok&&!d.ok(st))return;if(st.cash<d.c){say('Not enough money');return}
+ st.cash-=d.c;st.grid[q]={t:tool,a:0};dust(i,j,12);hud()}
+function expand(){if(st.lvl>=4)return;const c=[5e4,15e4,4e5,1e6][st.lvl];if(st.cash<c){say('Need '+f$(c));return}st.cash-=c;st.lvl++;sh=8;say('🌍 Territory expanded!');hud()}
+function dust(i,j,n){const p=pr(i,j);for(let k=0;k<n;k++)pa.push({x:p.x,y:p.y,vx:(Math.random()-.5)*2,vy:-Math.random()*2,l:30,c:'#e8d9a8'})}
+function tw(){return Math.min(W/13,56)*cam.z}
+function pr(i,j){const w=tw();return{x:W/2+cam.x+(i-j)*w/2,y:H*.2+cam.y+(i+j)*w/4+w/4}}
+function inv(mx,my){const w=tw(),a=(mx-W/2-cam.x)/(w/2),b=(my-H*.2-cam.y-w/4)/(w/4);return[Math.round((a+b)/2),Math.round((b-a)/2)]}
+const shc={};function shade(h,f){const k=h+f;if(shc[k])return shc[k];const n=parseInt(h.slice(1),16);return shc[k]='rgb('+Math.min(255,Math.round((n>>16)*f))+','+Math.min(255,Math.round((n>>8&255)*f))+','+Math.min(255,Math.round((n&255)*f))+')'}
+function poly(p,c){x.fillStyle=c;x.beginPath();x.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)x.lineTo(p[i],p[i+1]);x.closePath();x.fill()}
+function diamond(cx,cy,hw,hh,c){poly([cx,cy-hh,cx+hw,cy,cx,cy+hh,cx-hw,cy],c)}
+function box(cx,cy,hw,hh,h,col){poly([cx-hw,cy,cx,cy+hh,cx,cy+hh-h,cx-hw,cy-h],shade(col,.7));poly([cx+hw,cy,cx,cy+hh,cx,cy+hh-h,cx+hw,cy-h],shade(col,.88));diamond(cx,cy-h,hw,hh,shade(col,1.1))}
+function carsUpd(){const roads=[];st.grid.forEach((b,q)=>{if(b&&b.t==='road')roads.push(q)});
+ while(cars.length<Math.min(16,roads.length/2)){const q=roads[Math.floor(Math.random()*roads.length)];cars.push({i:q%N,j:Math.floor(q/N),ti:q%N,tj:Math.floor(q/N),p:1,c:['#ff5a5a','#5ac8ff','#ffd84a','#fff'][cars.length%4]})}
+ for(const c of cars){c.p+=.04;if(c.p>=1){c.i=c.ti;c.j=c.tj;c.p=0;const nb=[[1,0],[-1,0],[0,1],[0,-1]].map(d=>[c.i+d[0],c.j+d[1]]).filter(a=>{const b=st.grid[ix(a[0],a[1])];return a[0]>=0&&a[1]>=0&&a[0]<N&&a[1]<N&&b&&b.t==='road'});
+  if(!nb.length||!st.grid[ix(c.i,c.j)]){const q=roads[Math.floor(Math.random()*roads.length)];if(q===undefined)continue;c.i=c.ti=q%N;c.j=c.tj=Math.floor(q/N);continue}const n=nb[Math.floor(Math.random()*nb.length)];c.ti=n[0];c.tj=n[1]}}}
+function draw(){
+ fr++;const w=tw(),hw=w/2,hh=w/4,z=cam.z,k=(Math.sin(fr/300)+1)/2,night=lo((.45-k)*2.4,0,1);
+ x.setTransform(dpr,0,0,dpr,0,0);
+ const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0c2c52');g.addColorStop(1,'#08213f');x.fillStyle=g;x.fillRect(0,0,W,H);
+ if(sh>.3){x.translate((Math.random()-.5)*sh,(Math.random()-.5)*sh);sh*=.9}
+ for(let d=0;d<2*N-1;d++)for(let i=Math.max(0,d-N+1);i<=Math.min(d,N-1);i++){const j=d-i,p=pr(i,j),cx=p.x,cy=p.y,u=unl(i,j),b=st.grid[ix(i,j)];
+  diamond(cx,cy,hw,hh,u?((i+j)%2?'#3d8b4a':'#398046'):'#0f3560');
+  if(!u&&!b){x.strokeStyle='rgba(120,190,255,.08)';x.beginPath();x.moveTo(cx-hw*.4,cy);x.lineTo(cx+hw*.4,cy);x.stroke()}
+  if(!b)continue;
+  if(b.a<1)b.a=Math.min(1,b.a+.05);const D=B[b.t],hgt=D.h*z*b.a*(b.t==='road'?1:1.2);
+  if(b.t==='road'){diamond(cx,cy,hw*.92,hh*.92,'#3a3f48');x.strokeStyle='rgba(255,255,200,.35)';x.setLineDash([3,4]);x.beginPath();x.moveTo(cx-hw*.5,cy-hh*.5);x.lineTo(cx+hw*.5,cy+hh*.5);x.stroke();x.setLineDash([]);continue}
+  if(b.t==='park'){diamond(cx,cy,hw*.9,hh*.9,'#2fbf5a');for(const o of[-.3,.1,.35]){x.fillStyle='#1c7a3a';x.beginPath();x.arc(cx+o*hw,cy-hh*.2*(o+.5)-4*z,5*z,0,7);x.fill()}continue}
+  if(b.a<1)x.globalAlpha=.65+.35*b.a;
+  box(cx,cy,hw*.72,hh*.72,hgt,D.col);x.globalAlpha=1;
+  if(b.t==='house'){poly([cx-hw*.72,cy-hgt,cx,cy-hh*.72-hgt-8*z,cx+hw*.72,cy-hgt,cx,cy+hh*.72-hgt],'#b8452f')}
+  if((b.t==='factory'||b.t==='coal')&&fr%14==0&&b.a>=1)pa.push({x:cx+hw*.3,y:cy-hgt-4,vx:.2,vy:-.5,l:40,c:'#aaa'});
+  if(b.t==='solar'){x.strokeStyle='#9fd0ff';x.beginPath();x.moveTo(cx-hw*.4,cy-hgt);x.lineTo(cx+hw*.4,cy-hgt);x.stroke()}
+  x.font=Math.round(15*z)+'px serif';x.textAlign='center';x.fillText(D.e,cx,cy-hgt-hh*.72-2*z);
+  if(night>.2&&D.h>=12&&b.a>=1){x.fillStyle='rgba(255,220,120,'+night+')';const rows=Math.floor(hgt/8);for(let r=1;r<=rows;r++){x.fillRect(cx-hw*.5,cy+hh*.3-hgt*r/(rows+1)+2,3*z,3*z);x.fillRect(cx-hw*.2,cy+hh*.5-hgt*r/(rows+1)+2,3*z,3*z)}}}
+ carsUpd();for(const c of cars){const a=pr(c.i,c.j),b=pr(c.ti,c.tj),px=a.x+(b.x-a.x)*c.p,py=a.y+(b.y-a.y)*c.p;x.fillStyle=c.c;x.fillRect(px-2*z,py-2*z,4*z,3*z);if(night>.3){x.fillStyle='rgba(255,240,150,.5)';x.beginPath();x.arc(px,py,6*z,0,7);x.fill()}}
+ for(const p of pa){p.x+=p.vx;p.y+=p.vy;p.l--;x.globalAlpha=Math.max(0,p.l/40);x.fillStyle=p.c;x.fillRect(p.x,p.y,3,3)}x.globalAlpha=1;pa=pa.filter(p=>p.l>0);
+ x.setTransform(dpr,0,0,dpr,0,0);
+ if(night>0){x.fillStyle='rgba(8,10,45,'+night*.5+')';x.fillRect(0,0,W,H)}
+ if(st.rain){x.strokeStyle='rgba(170,200,255,.5)';x.beginPath();for(let i=0;i<50;i++){const rx=(i*97+fr*3)%W,ry=(i*53+fr*9)%H;x.moveTo(rx,ry);x.lineTo(rx-3,ry+9)}x.stroke();x.fillStyle='rgba(20,30,60,.2)';x.fillRect(0,0,W,H)}
+ if(fr-toastT>150)$('toast').style.opacity=0;
+ requestAnimationFrame(draw)}
+function fit(){const r=$('map').getBoundingClientRect();dpr=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr}
+addEventListener('resize',fit);
+cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY,mx:e.clientX,my:e.clientY,pan:0}});
+addEventListener('pointermove',e=>{if(!down)return;if(!down.pan&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>6)down.pan=1;if(down.pan){cam.x+=e.clientX-down.mx;cam.y+=e.clientY-down.my}down.mx=e.clientX;down.my=e.clientY});
+addEventListener('pointerup',e=>{if(down&&!down.pan){const r=cv.getBoundingClientRect(),t=inv(e.clientX-r.left,e.clientY-r.top);place(t[0],t[1])}down=null});
+$('zi').onclick=()=>cam.z=Math.min(1.8,cam.z*1.2);$('zo').onclick=()=>cam.z=Math.max(.6,cam.z/1.2);
+cv.addEventListener('wheel',e=>{e.preventDefault();cam.z=lo(cam.z*(e.deltaY<0?1.1:.9),.6,1.8)},{passive:false});
+$('bar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.t==='expand')expand();else{tool=b.dataset.t;bar()}});
+$('nt').onclick=()=>{if($('md').style.display!=='flex')turn()};
+$('au').onclick=()=>{if(auto){clearInterval(auto);auto=null}else auto=setInterval(()=>{if($('md').style.display!=='flex')turn()},3000);$('au').className=auto?'on':''};
+$('go').onclick=()=>modal('<h2>🏆 Ways to win</h2>'+GO.map((g,k)=>'<div><b>'+g[0]+(st.won[k]?' ✅':'')+'</b> <small style="color:var(--mu)">'+g[1]+'</small><div class="pb"><i style="width:'+Math.round(lo(g[3](st),0,1)*100)+'%"></i></div></div>').join('')+'<button onclick="cm()">Back to my country</button><button onclick="if(confirm(\'Start a new country?\')){st=fresh();cars=[];hud();cm()}">New country</button>');
+$('mb').addEventListener('click',e=>{const b=e.target.closest('button[data-c]');if(b&&!b.disabled)choose(+b.dataset.c)});
+fit();hud();if(st.ev!=null)evModal();requestAnimationFrame(draw);
+</script></body></html>

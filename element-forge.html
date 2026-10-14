@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ELEMENT FORGE</title>
+<style>
+:root{--bg:#04060f;--bg2:#0a1030;--pn:rgba(14,20,48,.82);--ln:rgba(80,220,255,.28);--fg:#eef4ff;--mu:#8fa3c8;--cy:#38e8ff;--vi:#a06bff;--go:#ffcf5a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#04060f}}
+:root[data-theme="dark"]{--bg:#04060f}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Bahnschrift,"Segoe UI",system-ui,sans-serif;font-size:15px;overscroll-behavior:none}
+body{background:radial-gradient(circle at 50% 30%,var(--bg2),var(--bg) 70%)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--go);outline-offset:2px}
+body.hc{--bg:#000;--bg2:#000;--pn:#000;--ln:#fff;--mu:#ddd}body.hc .chip,body.hc .panel{border-width:2px}
+body.rm *{animation:none!important;transition:none!important}
+#app{height:100%;display:flex;flex-direction:column;max-width:1500px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 12px}
+h1{margin:0;font-size:20px;letter-spacing:4px;background:linear-gradient(90deg,var(--cy),var(--vi),var(--go));-webkit-background-clip:text;background-clip:text;color:transparent}
+nav{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+nav button{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--ln);background:var(--pn);font-size:18px}
+main{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:0 8px 8px}
+.panel{background:var(--pn);border:1px solid var(--ln);border-radius:18px;box-shadow:0 0 24px rgba(56,232,255,.08) inset;padding:10px;min-height:0}
+#forge{order:1;display:flex;flex-direction:column;align-items:center;gap:6px;overflow-y:auto}
+#lib{order:2;flex:1;display:flex;flex-direction:column;min-height:180px}
+#jr{display:none;overflow-y:auto}
+#q{width:100%;min-height:44px;border-radius:12px;border:1px solid var(--ln);background:#050a20;color:var(--fg);padding:0 12px;font:inherit}
+#libl{flex:1;overflow-y:auto;margin-top:8px;-webkit-overflow-scrolling:touch}
+details{margin:4px 0}summary{padding:8px 4px;cursor:pointer;font-weight:bold;color:var(--mu);min-height:40px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 8px}
+.chip{min-height:44px;padding:6px 10px;border-radius:12px;border:1px solid var(--ln);background:#0a1230;display:flex;align-items:center;gap:6px;font-size:14px}
+.chip.on{border-color:var(--go);box-shadow:0 0 10px var(--go)}
+.chip i{font-style:normal;font-size:20px}.chip small{color:var(--mu)}
+#slots{display:flex;align-items:center;gap:10px;font-size:22px;color:var(--mu)}
+.slot{width:112px;min-height:78px;border-radius:16px;border:2px dashed var(--ln);background:#050a20;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;padding:4px}
+.slot i{font-style:normal;font-size:32px}.slot.f{border-style:solid;border-color:var(--cy)}
+#fw{position:relative;width:100%;max-width:400px;aspect-ratio:1}
+#fc{display:block;margin:auto}
+#core{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center}
+#core i{font-style:normal;font-size:56px;filter:drop-shadow(0 0 14px var(--cy))}#core b{font-size:15px;letter-spacing:2px}
+.pop{animation:pop .6s ease-out}@keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+#go{width:100%;max-width:400px;min-height:56px;border-radius:16px;border:0;background:linear-gradient(90deg,var(--cy),var(--vi));color:#02061a;font-weight:bold;font-size:20px;letter-spacing:3px}
+#go[disabled]{opacity:.35;cursor:not-allowed}
+.row2{display:flex;gap:8px;width:100%;max-width:400px}.row2 button{flex:1;min-height:48px;border-radius:14px;border:1px solid var(--ln);background:#0a1230}
+#res{min-height:22px;text-align:center;color:var(--go);font-weight:bold}
+#home{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;background:radial-gradient(circle at 50% 35%,#101a4a,#04060f 70%)}
+#home h1{font-size:clamp(30px,9vw,60px);letter-spacing:8px}
+.fl{display:flex;gap:16px;margin:18px 0;font-size:34px}.fl span{animation:fl 3s ease-in-out infinite}.fl span:nth-child(2){animation-delay:.5s}.fl span:nth-child(3){animation-delay:1s}.fl span:nth-child(4){animation-delay:1.5s}
+@keyframes fl{50%{transform:translateY(-10px)}}
+.fl small{display:block;font-size:12px;color:var(--mu)}
+#start{min-height:60px;padding:0 34px;border-radius:18px;border:0;background:linear-gradient(90deg,var(--cy),var(--vi));color:#02061a;font-weight:bold;font-size:20px;letter-spacing:3px}
+.stats{display:flex;gap:18px;margin-top:22px;color:var(--mu);font-size:13px;flex-wrap:wrap;justify-content:center}.stats b{display:block;color:var(--fg);font-size:16px}
+#reveal,#sheet{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(2,4,14,.86)}
+[hidden]{display:none!important}
+.box{width:100%;max-width:520px;max-height:100%;overflow-y:auto;background:#0a1030;border:1px solid var(--ln);border-radius:20px;padding:16px}
+.box h2{margin:0 0 8px;font-size:18px;letter-spacing:2px}
+.rv{text-align:center}.rv .em{font-size:96px;line-height:1.1;animation:pop .9s ease-out}.rv h3{font-size:34px;margin:4px 0;letter-spacing:3px}.rv .nd{letter-spacing:6px;color:var(--go);font-weight:bold}
+.rv p{color:var(--mu);font-style:italic}
+.btn{min-height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--ln);background:#0a1230;margin:4px}.btn.p{background:linear-gradient(90deg,var(--cy),var(--vi));color:#02061a;border:0;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.cell{min-height:84px;border-radius:14px;border:1px solid var(--ln);background:#0a1230;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;text-align:center;padding:4px}.cell i{font-style:normal;font-size:26px}.cell.lk{opacity:.55}
+.bar{height:8px;border-radius:4px;background:#16204a;overflow:hidden;margin:3px 0 8px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cy),var(--vi))}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;border:1px solid currentColor;font-size:12px;margin:2px 0}
+.ach{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #16204a}.ach.lk{opacity:.45}.ach i{font-style:normal;font-size:26px}
+#toasts{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:50;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.toast{background:#101a4a;border:1px solid var(--go);padding:10px 16px;border-radius:14px;animation:pop .4s}
+#mapc{width:100%;height:60vh;border-radius:14px;background:#03050e;touch-action:none;display:block}
+@media (min-width:900px){main{display:grid;grid-template-columns:300px 1fr 300px;gap:12px;padding:0 12px 12px}#lib{order:0}#forge{order:0}#jr{display:block}#navj{display:none}.slot{width:130px}}
+</style></head><body>
+<div id="home"><h1>ELEMENT FORGE</h1><p style="color:var(--mu);font-size:18px;margin:6px 0">Everything begins with four elements.</p>
+<div class="fl"><span>🔥<small>Fire</small></span><span>💧<small>Water</small></span><span>🌍<small>Earth</small></span><span>💨<small>Air</small></span></div>
+<button id="start">⚡ START FORGING</button>
+<div class="stats"><div><b>5,000+</b>POSSIBLE DISCOVERIES</div><div><b>60+</b>ACHIEVEMENTS</div><div><b>∞</b>UNLIMITED EXPERIMENTS</div></div></div>
+<div id="app"><header><h1>ELEMENT FORGE</h1><nav>
+<button id="navj" aria-label="Journal">📊</button><button data-s="codex" aria-label="Codex">📖</button><button data-s="map" aria-label="Discovery map">🌌</button><button data-s="hist" aria-label="History">🕒</button><button data-s="ach" aria-label="Achievements">🏆</button><button data-s="daily" aria-label="Daily mystery">📅</button><button data-s="set" aria-label="Settings">⚙️</button></nav></header>
+<main><section id="lib" class="panel" aria-label="Element library"><input id="q" type="search" placeholder="Search discoveries..." aria-label="Search discoveries"><div id="libl"></div></section>
+<section id="forge" class="panel" aria-label="The Forge"><div id="slots"><button class="slot" id="sa" aria-label="Slot A"></button><span>+</span><button class="slot" id="sb" aria-label="Slot B"></button></div>
+<div id="fw"><canvas id="fc" aria-hidden="true"></canvas><div id="core"></div></div>
+<button id="go" disabled>⚡ FORGE</button><div class="row2"><button id="sur">🎲 SURPRISE ME</button><button id="clr">✖ Clear</button></div><div id="res" aria-live="polite"></div></section>
+<section id="jr" class="panel" aria-label="Discovery journal"></section></main></div>
+<div id="reveal" hidden></div><div id="sheet" hidden><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h2 id="sht"></h2><button class="btn" id="shx" aria-label="Close">✕</button></div><div id="shb"></div></div></div><div id="toasts"></div>
+<script>
+const CATS=[['N','🔥','Nature','#5eead4'],['M','🌊','Materials','#fbbf24'],['L','🧬','Life','#86efac'],['T','⚙️','Technology','#38bdf8'],['C','🏙️','Civilization','#f0abfc'],['S','🌌','Space','#a78bfa'],['E','🎮','Entertainment','#fb7185'],['I','🧠','Ideas','#fde68a'],['R','✨','Rare','#ffd166'],['X','❓','Mystery','#ff9cf5']];
+const CM=Object.fromEntries(CATS.map(c=>[c[0],c]));
+const RAR=[['Common','⚪','#cfd8e3'],['Uncommon','🟢','#4ade80'],['Rare','🔵','#4aa8ff'],['Epic','🟣','#b26bff'],['Legendary','🟠','#ffab3d'],['Mythic','🔴','#ff4d6d'],['Secret','🌈','#ff9cf5']];
+const ED=`Fire,🔥,N;Water,💧,N;Earth,🌍,N;Air,💨,N;Steam,♨️,N;Mud,🟤,M;Lava,🌋,N;Cloud,☁️,N;Dust,🌫️,N;Energy,⚡,N;Lake,🏞️,N;Ocean,🌊,N;Rain,🌧️,N;Storm,⛈️,N;Lightning,🌩️,N;Wind,🌬️,N;Snow,❄️,N;Ice,🧊,N;Rock,🪨,M;Bigger Rock,⛰️,M;Mountain,🏔️,N;River,〰️,N;Volcano,🗻,N;Sand,🏖️,M;Glass,🪟,M;Metal,🔩,M;Wood,🪵,M;Paper,📄,M;Atom,⚛️,M;Molecule,🧫,M;Plant,🌱,L;Tree,🌳,L;Forest,🌲,L;Flower,🌸,L;Wheat,🌾,L;Bread,🍞,L;Potato,🥔,L;Banana,🍌,L;Life,🧬,L;Fish,🐟,L;School of Fish,🐠,L;Bird,🐦,L;Animal,🐾,L;Insect,🐛,L;Bee,🐝,L;Human,🧑,L;Brain,🧠,L;Dinosaur,🦖,L;Dog,🐕,L;Cat,🐈,L;Cow,🐄,L;Milk,🥛,L;Cheese,🧀,L;Egg,🥚,L;Pizza,🍕,L;Tool,🔧,T;Electricity,🔌,T;Wire,🪢,T;Battery,🔋,T;Light Bulb,💡,T;Circuit,🧩,T;Chip,💾,T;Computer,💻,T;Phone,📱,T;Internet,🌐,T;Server,🗄️,T;AI,🦾,T;Robot,🤖,T;Drone,🚁,T;Satellite,🛰️,T;Village,🏘️,C;Town,🏡,C;City,🏙️,C;Country,🗺️,C;School,🏫,C;University,🎓,C;Hospital,🏥,C;Airport,🛫,C;Road,🛣️,C;Car,🚗,C;Train,🚆,C;Plane,✈️,C;Ship,🚢,C;Bridge,🌉,C;Boat,⛵,C;Gold,🪙,C;Treasure,💰,C;Crown,👑,C;Castle,🏰,C;Toilet,🚽,C;Book,📚,C;Gravity,🧲,S;Time,⏳,I;Space,🌌,S;Star,⭐,S;Sun,☀️,S;Moon,🌙,S;Planet,🪐,S;Galaxy,🌀,S;Universe,🌠,S;Black Hole,🕳️,S;Wormhole,⭕,S;Mars,🔴,S;Alien,👽,S;UFO,🛸,S;Comet,☄️,S;Asteroid,🌑,S;Rocket,🚀,S;Astronaut,🧑‍🚀,S;Space Station,🏗️,S;Quantum,🔮,S;Game,🕹️,E;Game Console,🎮,E;Virtual Reality,🥽,E;Music,🎵,E;Movie,🎬,E;Cartoon,📺,E;Superhero,🦸,E;Streamer,🎙️,E;Idea,💭,I;Love,❤️,I;Dream,😴,I;Chaos,🌪️,I;Magic,🪄,I;Wizard,🧙,I;Dragon,🐉,I;Ghost,👻,I;Super AI,✨,R;Multiverse,🎇,R;Eternity,♾️,R;Time Machine,🕰️,R;Potato PC,🥔💻,X;Moon Cheese,🌙🧀,X;Space Pizza,🍕🌌,X;Internet Cat,🐱🌐,X;Quantum Potato,🥔⚛️,R;Space Cow,🐮🚀,X;Invisible Banana,🫥🍌,X;Time Pizza,🍕⏳,X;Cosmic Toilet,🚽🌌,R;Robo Dog,🐕🤖,X;Banana Phone,🍌📱,X;Pizza Robot,🍕🤖,X;Ancient Robot,🦴🤖,R`;
+const RS=`Fire+Water=Steam;Earth+Water=Mud;Earth+Fire=Lava;Air+Water=Cloud;Air+Earth=Dust;Air+Fire=Energy;Water+Water=Lake;Lake+Lake=Ocean;Cloud+Water=Rain;Cloud+Cloud=Storm;Energy+Storm=Lightning;Air+Cloud=Wind;Rain+Wind=Snow;Snow+Snow=Ice;Earth+Earth=Rock;Rock+Rock=Bigger Rock;Cloud+Rock=Mountain;Mountain+Water=River;Lava+Mountain=Volcano;Rock+Wind=Sand;Fire+Sand=Glass;Fire+Rock=Metal;Metal+Rock=Tool;Tool+Tree=Wood;Water+Wood=Paper;Dust+Energy=Atom;Atom+Atom=Molecule;Earth+Rain=Plant;Plant+Rain=Tree;Tree+Tree=Forest;Air+Plant=Flower;Earth+Plant=Wheat;Fire+Wheat=Bread;Mud+Plant=Potato;Sun+Tree=Banana;Lightning+Ocean=Life;Life+Water=Fish;Fish+Fish=School of Fish;Air+Life=Bird;Earth+Life=Animal;Animal+Flower=Insect;Flower+Insect=Bee;Animal+Tool=Human;Human+Lightning=Brain;Animal+Volcano=Dinosaur;Animal+Human=Dog;Animal+Wind=Cat;Animal+Plant=Cow;Cow+Water=Milk;Milk+Time=Cheese;Bird+Earth=Egg;Bread+Cheese=Pizza;Energy+Metal=Electricity;Electricity+Metal=Wire;Electricity+Tool=Battery;Electricity+Glass=Light Bulb;Sand+Wire=Circuit;Circuit+Electricity=Chip;Chip+Glass=Computer;Air+Computer=Phone;Cloud+Computer=Internet;Computer+Computer=Server;Brain+Computer=AI;AI+Internet=Super AI;Computer+Metal=Robot;Air+Robot=Drone;Computer+Rocket=Satellite;Computer+Human=Game;Circuit+Game=Game Console;Game+Glass=Virtual Reality;Human+Tree=Village;Village+Village=Town;Town+Town=City;City+City=Country;Brain+Village=School;School+School=University;Life+Town=Hospital;Air+City=Airport;Rock+Village=Road;Metal+Road=Car;Car+Metal=Train;Bird+Metal=Plane;Metal+Ocean=Ship;Metal+River=Bridge;Lake+Wood=Boat;Metal+Sun=Gold;Gold+Mountain=Treasure;Gold+Human=Crown;Mountain+Village=Castle;Human+Lake=Toilet;Human+Paper=Book;Earth+Energy=Gravity;Energy+Gravity=Time;Air+Gravity=Space;Fire+Space=Star;Air+Star=Sun;Ice+Planet=Moon;Earth+Space=Planet;Star+Star=Galaxy;Galaxy+Galaxy=Universe;Gravity+Star=Black Hole;Black Hole+Space=Wormhole;Dust+Planet=Mars;Life+Space=Alien;Alien+Metal=UFO;Ice+Space=Comet;Rock+Space=Asteroid;Metal+Space=Rocket;Human+Rocket=Astronaut;Moon+Rocket=Space Station;Atom+Space=Quantum;Universe+Wormhole=Multiverse;Time+Universe=Eternity;Computer+Time=Time Machine;Air+Human=Music;Light Bulb+Music=Movie;Game+Movie=Cartoon;Human+Storm=Superhero;Human+Internet=Streamer;Brain+Light Bulb=Idea;Flower+Human=Love;Brain+Cloud=Dream;Dream+Storm=Chaos;Dream+Energy=Magic;Human+Magic=Wizard;Dinosaur+Magic=Dragon;Dream+Human=Ghost;Computer+Potato=Potato PC;Cheese+Moon=Moon Cheese;Pizza+Space=Space Pizza;Cat+Internet=Internet Cat;Potato+Quantum=Quantum Potato;Cow+Space=Space Cow;Banana+Ghost=Invisible Banana;Pizza+Time=Time Pizza;Galaxy+Toilet=Cosmic Toilet;Dog+Robot=Robo Dog;Banana+Phone=Banana Phone;Pizza+Robot=Pizza Robot;Dinosaur+Robot=Ancient Robot`;
+const OV={'Black Hole':5,'Wormhole':5,'Universe':5,'Multiverse':6,'Eternity':6,'Super AI':6,'Time Machine':6,'Cosmic Toilet':6,'Quantum Potato':6,'Ancient Robot':6,'Dragon':4,'Galaxy':4,'AI':4};
+const QT={'Black Hole':'Something has gone very, very wrong.','Super AI':'It read the whole internet and asked for more.','Lava':'Molten rock created by combining Earth and Fire.','Pizza':'A round argument settled by cheese.','Space Cow':'One small moo for cowkind.','Potato PC':'Runs everything. Slowly. Deliciously.','Cosmic Toilet':'The universe has a very strange plumbing budget.','Multiverse':'Every choice, everywhere, all at once.','Eternity':'Time finally stopped counting.','Dragon':'Magic met the dinosaurs and things escalated.','Time Machine':'Mostly used to avoid deadlines.','Robo Dog':'Good boy.exe','Steam':'Water that got ideas above its station.','Quantum Potato':'Both baked and unbaked until observed.'};
+const E={},RC={};ED.split(';').forEach(s=>{const [n,e,c]=s.split(',');E[n]={n,e,c,d:['Fire','Water','Earth','Air'].includes(n)?0:null}});
+const REC=RS.split(';').map(s=>{const [l,r]=s.split('=');const [a,b]=l.split('+');RC[[a,b].sort().join('+')]=r;return[a,b,r]});
+for(let p=0;p<40;p++)REC.forEach(([a,b,r])=>{if(E[a].d!=null&&E[b].d!=null&&E[r].d==null){E[r].d=1+Math.max(E[a].d,E[b].d);E[r].p=[a,b]}});
+const BASE=['Fire','Water','Earth','Air'];
+const DESC=(n,a,b)=>QT[n]||('A '+CM[E[n].c][2].toLowerCase()+' discovery forged from '+a+' and '+b+'.');
+const hash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0};
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='elementforge_v1';
+let st={found:{},cust:{},combos:0,ns:0,bns:0,tried:{},daily:{last:'',streak:0,done:''},ach:{},set:{snd:1,mus:0,vol:.7,hc:0,rm:0},stats:{sur:0,fb:0,share:0},order:0,best:0};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s)st=Object.assign(st,s,{set:Object.assign(st.set,s.set||{}),stats:Object.assign(st.stats,s.stats||{})})}catch(e){}
+BASE.forEach(n=>{if(!st.found[n])st.found[n]={t:0,n:0,i:0}});
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches&&st.set.rm===0)st.set.rm=1;
+const find=n=>E[n]||st.cust[n],isBase=n=>BASE.includes(n);
+const rIdx=n=>{const el=find(n);if(OV[n]!=null)return OV[n];const d=el.d||0,r=d<=1?0:d<=2?1:d<=4?2:d<=6?3:d<=8?4:5;return E[n]?r:Math.min(3,r)};
+const cnt=()=>Object.keys(st.found).length-4;
+const key=(a,b)=>[a,b].sort().join('+');
+function combine(a,b){const k=key(a,b);if(RC[k])return E[RC[k]];
+ const [x,y]=[a,b].sort(),h=hash(k),P=['Quantum','Cosmic','Turbo','Ancient','Tiny','Haunted','Golden','Spicy','Sleepy','Neon'];let n;
+ if(a===b)n='Mega '+a;else{const t=h%5;n=t==0?x+' '+y:t==1?x.slice(0,Math.ceil(x.length/2))+y.slice(Math.floor(y.length/2)).toLowerCase():t==2?x+'-'+y+' Hybrid':t==3?P[(h>>3)%10]+' '+((h&8)?x:y):y+' '+x+' Mix'}
+ if(find(n))return find(n);
+ const A=find(a),B=find(b);st.cust[n]={n,e:a===b?A.e+'✨':A.e+B.e,c:a===b?A.c:'X',d:Math.max(A.d||0,B.d||0)+1,a,b,cu:1};return st.cust[n]}
+const fmt=n=>n.toLocaleString('en-US');
+let A=null,B=null,busy=false,openC={N:1},q='';
+// ---------- audio
+let AC,MG,mt;
+function au(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();MG=AC.createGain();MG.connect(AC.destination)}catch(e){return false}}MG.gain.value=st.set.vol;if(AC.state==='suspended')AC.resume();return true}
+function tone(f,d,ty,v,dl,f2){if(!AC)return;const t=AC.currentTime+(dl||0),o=AC.createOscillator(),g=AC.createGain();o.type=ty||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.15,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(MG);o.start(t);o.stop(t+d+.05)}
+function sfx(k,r){if(!st.set.snd||!au())return;
+ if(k==='sel')tone(660,.08,'triangle',.12);
+ else if(k==='forge'){tone(120,1,'sawtooth',.08,0,700);tone(240,1,'sine',.08,0,1400)}
+ else if(k==='ok')[523,659,784].forEach((f,i)=>tone(f,.25,'triangle',.13,i*.08));
+ else if(k==='new'){[523,659,784,1047].forEach((f,i)=>tone(f,.4,'sine',.14,i*.09));if(r>=2)[262,392,523,784,1047].forEach((f,i)=>tone(f,.9,'triangle',.1,.3+i*.1))}
+ else if(k==='ach')[784,988,1175,1568].forEach((f,i)=>tone(f,.3,'square',.06,i*.07));
+ else if(k==='daily')[440,554,659,880,1108].forEach((f,i)=>tone(f,.4,'triangle',.12,i*.1))}
+function music(){clearInterval(mt);if(!st.set.mus)return;if(!au())return;let n=0;const N=[261.6,293.7,329.6,392,440,523.3,392,329.6];mt=setInterval(()=>{if(document.hidden||!st.set.mus)return;tone(N[Math.floor(Math.random()*N.length)],3,'sine',.05);if(n++%4==0)tone(65.4,5,'sine',.06)},2400)}
+// ---------- achievements
+const ACH=[];
+[[1,'First Spark','⚡'],[10,'Tinkerer','🔧'],[25,'Curious Mind','🧠'],[50,'Lab Rat','🐀'],[100,'Experimentalist','🧪'],[250,'Researcher','🔬'],[500,'Alchemist','⚗️'],[1000,'Mad Scientist','🥼'],[2500,'Grand Architect','🏛️'],[5000,'Element God','👑']].forEach(([n,t,i])=>ACH.push(['m'+n,i,t,'Discover '+fmt(n)+' element'+(n>1?'s':''),S=>S.n>=n]));
+CATS.forEach(([c,i,t])=>{const k=c==='R'?3:c==='X'?8:10;ACH.push(['c'+c,i,t+' Expert','Discover '+k+' '+t+' elements',S=>(S.cat[c]||0)>=k])});
+['Lucky Find','Rare Catch','Epic Moment','Legend Born','Mythic Touch','Secret Keeper'].forEach((t,j)=>ACH.push(['r'+(j+1),RAR[j+1][1],t,'Discover a '+RAR[j+1][0]+' element',S=>(S.rar[j+1]||0)>=1]));
+[['Black Hole','Void Walker','🕳️'],['Galaxy','Universe Builder','🌀'],['Life','Spark of Life','🧬'],['Human','First Humans','🧑'],['Computer','Digital Age','💻'],['AI','Mind of Metal','🦾'],['Robo Dog','Cyber Companion','🐕'],['Dragon','Dragon Tamer','🐉'],['Pizza','Pizza Party','🍕'],['Space Cow','Cow in Orbit','🐮'],['Potato PC','Potato Power','🥔'],['Volcano','Volcano Lord','🗻'],['Lightning','Storm Chaser','🌩️'],['Time','Clockwork Mind','⏳'],['Star','Star Maker','⭐'],['Ocean','Deep Blue','🌊'],['Alien','First Contact','👽'],['Tree','Tree Hugger','🌳'],['Wizard','Spellcaster','🧙'],['Time Machine','Time Traveler','🕰️'],['Eternity','Beyond Forever','♾️'],['Multiverse','Multiversal','🎇'],['Super AI','Singularity','✨']].forEach(([n,t,i])=>ACH.push(['s'+n,i,t,'Discover '+n,S=>!!st.found[n]]));
+[[50,'Warm-Up'],[250,'Mixmaster'],[1000,'Forge Machine']].forEach(([n,t])=>ACH.push(['k'+n,'🔥',t,'Forge '+fmt(n)+' combinations',S=>st.combos>=n]));
+[[5,'Hot Streak'],[10,'On Fire']].forEach(([n,t])=>ACH.push(['n'+n,'🔥',t,n+' new discoveries in a row',S=>st.bns>=n]));
+[[1,'Daily Solver'],[3,'Three-Peat'],[7,'Week Warrior'],[30,'Monthly Master']].forEach(([n,t])=>ACH.push(['d'+n,'📅',t,'Daily streak of '+n,S=>st.daily.streak>=n]));
+ACH.push(['sur','🎲','Feeling Lucky','Use Surprise Me 10 times',S=>st.stats.sur>=10],['fb1','🤪','Chaos Engineer','Create an absurd combination',S=>st.stats.fb>=1],['fb10','🌀','Absurdist','Create 10 absurd combinations',S=>st.stats.fb>=10],['shr','📣','Show-Off','Share a discovery',S=>st.stats.share>=1],['sec5','🌈','Secret Finder','Discover 5 secret elements',S=>(S.rar[6]||0)>=5]);
+function checkAch(){const S={n:cnt(),cat:{},rar:{}};for(const n in st.found){if(isBase(n))continue;const e=find(n);S.cat[e.c]=(S.cat[e.c]||0)+1;const r=rIdx(n);S.rar[r]=(S.rar[r]||0)+1}
+ if(!S.rar[6])S.rar[6]=0;for(const n in st.found){}for(const a of ACH)if(!st.ach[a[0]]&&a[4](S)){st.ach[a[0]]=Date.now();toast('🏆 '+a[2]+' — '+a[3]);sfx('ach')}}
+// secret rarity for secrets
+const SECRET=new Set(['Super AI','Multiverse','Eternity','Time Machine','Cosmic Toilet','Quantum Potato','Ancient Robot']);
+const _r=rIdx;
+// ---------- UI helpers
+function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;$('toasts').appendChild(d);setTimeout(()=>d.remove(),3200)}
+const rTag=n=>{const r=SECRET.has(n)?6:rIdx(n),R=RAR[r];return'<span class="tag" style="color:'+R[2]+'">'+R[1]+' '+R[0]+' '+'⭐'.repeat(Math.min(r+1,5))+'</span>'};
+const rI=n=>SECRET.has(n)?6:rIdx(n);
+function card(n){const e=find(n),f=st.found[n];if(!e)return'';const c=CM[e.c];
+ const ing=f&&f.a?esc(f.a)+' + '+esc(f.b):isBase(n)?'A basic element':e.p?esc(e.p[0])+' + '+esc(e.p[1]):'Unknown';
+ return'<div class="rv"><div class="em">'+e.e+'</div><h3>'+esc(n.toUpperCase())+'</h3><div>'+c[1]+' '+c[2]+'</div>'+rTag(n)+'<p>“'+esc(e.cu?'A strange creation from '+e.a+' and '+e.b+'.':(QT[n]||DESC(n,...(e.p||['?','?']))))+'”</p><div style="text-align:left;color:var(--mu);font-size:14px">Ingredients: <b style="color:var(--fg)">'+ing+'</b><br>Created: <b style="color:var(--fg)">'+(f?f.n:0)+' time'+(f&&f.n===1?'':'s')+'</b><br>First discovered: <b style="color:var(--fg)">'+(f&&f.t?new Date(f.t).toLocaleString():'—')+'</b></div></div>'}
+function sheet(t,h){$('sht').textContent=t;$('shb').innerHTML=h;$('sheet').hidden=false;$('shx').focus()}
+function closeSheet(){$('sheet').hidden=true;stopMap()}
+// ---------- render
+function slotHTML(n,l){return n?'<i>'+find(n).e+'</i>'+esc(n):'<span style="color:var(--mu)">'+l+'</span>'}
+function renderSlots(){$('sa').innerHTML=slotHTML(A,'Element A');$('sb').innerHTML=slotHTML(B,'Element B');$('sa').className='slot'+(A?' f':'');$('sb').className='slot'+(B?' f':'');$('go').disabled=!(A&&B)||busy}
+function renderLib(){const names=Object.keys(st.found).filter(n=>!q||n.toLowerCase().includes(q)).sort((a,b)=>st.found[a].i-st.found[b].i);const by={};names.forEach(n=>{(by[find(n).c]=by[find(n).c]||[]).push(n)});
+ $('libl').innerHTML=CATS.map(c=>{const l=by[c[0]]||[];if(!l.length&&q)return'';return'<details data-c="'+c[0]+'" '+(q||openC[c[0]]?'open':'')+'><summary>'+c[1]+' '+c[2]+' · '+l.length+'</summary><div class="chips">'+l.map(n=>'<button class="chip'+(n===A||n===B?' on':'')+'" data-n="'+esc(n)+'"><i>'+find(n).e+'</i>'+esc(n)+'</button>').join('')+'</div></details>'}).join('')}
+function jHTML(){const n=cnt(),ms=[10,50,100,250,500,1000,2500,5000],nx=ms.find(m=>m>n)||5000,pv=ms.filter(m=>m<=n).pop()||0,pr=Math.min(1,(n-pv)/(nx-pv)),C=326.7;
+ const rec=Object.keys(st.found).filter(k=>st.found[k].t).sort((a,b)=>st.found[b].t-st.found[a].t).slice(0,5),rar=Object.keys(st.found).filter(k=>!isBase(k)).sort((a,b)=>rI(b)-rI(a)||st.found[b].t-st.found[a].t).slice(0,3);
+ const cc={};Object.keys(st.found).forEach(k=>{if(!isBase(k))cc[find(k).c]=(cc[find(k).c]||0)+1});const tt={};Object.keys(E).forEach(k=>{if(!isBase(k))tt[E[k].c]=(tt[E[k].c]||0)+1});
+ return'<h2 style="letter-spacing:3px;margin:4px 0">DISCOVERIES</h2><div style="text-align:center"><svg width="130" height="130" viewBox="0 0 130 130" role="img" aria-label="Progress"><circle cx="65" cy="65" r="52" fill="none" stroke="#16204a" stroke-width="10"/><circle cx="65" cy="65" r="52" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-pr))+'" transform="rotate(-90 65 65)"/><defs><linearGradient id="g"><stop offset="0" stop-color="#38e8ff"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs><text x="65" y="72" text-anchor="middle" fill="#fff" font-size="26" font-weight="bold">'+fmt(n)+'</text></svg><div><b>'+fmt(n)+' / 5,000</b> · '+(n/50).toFixed(1)+'%<br><small style="color:var(--mu)">Next milestone: '+fmt(nx)+'</small></div></div>'
+ +'<p style="color:var(--mu)">🔥 Streak: <b style="color:var(--fg)">'+st.ns+'</b> (best '+st.bns+') · 📅 Daily: <b style="color:var(--fg)">'+st.daily.streak+'</b><br>⚗️ Combinations: <b style="color:var(--fg)">'+fmt(st.combos)+'</b> · 🏆 '+Object.keys(st.ach).length+'/'+ACH.length+'</p>'
+ +'<b>Recently discovered</b><div class="chips">'+(rec.map(k=>'<button class="chip" data-d="'+esc(k)+'"><i>'+find(k).e+'</i>'+esc(k)+'</button>').join('')||'<small>Nothing yet</small>')+'</div><b>Rarest</b><div class="chips">'+(rar.map(k=>'<button class="chip" data-d="'+esc(k)+'"><i>'+find(k).e+'</i>'+esc(k)+'</button>').join('')||'<small>—</small>')+'</div><b>Categories</b>'
+ +CATS.map(c=>{const a=cc[c[0]]||0,t=tt[c[0]]||0;return'<div style="font-size:13px">'+c[1]+' '+c[2]+' <span style="float:right;color:var(--mu)">'+a+(c[0]==='X'?'':' / '+t)+'</span></div><div class="bar"><i style="width:'+(t?Math.min(100,a/t*100):a?100:0)+'%"></i></div>'}).join('')}
+const renderJ=()=>{$('jr').innerHTML=jHTML()};
+function renderAll(){renderSlots();renderLib();renderJ()}
+// ---------- forge
+const fc=$('fc'),fx=fc.getContext('2d');let FS=300,PT=[],on=false,rot=0;
+function fit(){const w=Math.min($('fw').clientWidth||300,400),d=Math.min(2,devicePixelRatio||1);FS=w;fc.width=fc.height=w*d;fc.style.width=fc.style.height=w+'px';fx.setTransform(d,0,0,d,0,0)}
+function forgeLoop(){requestAnimationFrame(forgeLoop);if(document.hidden||$('home').style.display!=='none')return;
+ const c=FS/2,rm=st.set.rm,ca=A?CM[find(A).c][3]:'#38e8ff',cb=B?CM[find(B).c][3]:'#a06bff',k=on?1:.25;rot+=.01*(on?6:1)*(rm?.3:1);
+ fx.clearRect(0,0,FS,FS);const g=fx.createRadialGradient(c,c,0,c,c,FS*.48);g.addColorStop(0,on?'rgba(255,255,255,.55)':'rgba(56,232,255,.18)');g.addColorStop(.4,ca+'44');g.addColorStop(.7,cb+'22');g.addColorStop(1,'rgba(0,0,0,0)');fx.fillStyle=g;fx.fillRect(0,0,FS,FS);
+ for(let i=0;i<4;i++){fx.strokeStyle=[ca,cb,'#ffcf5a','#38e8ff'][i];fx.globalAlpha=.35+k*.5;fx.lineWidth=2+(on?1:0);fx.setLineDash([12+i*8,10]);fx.beginPath();fx.arc(c,c,FS*(.2+.075*i),rot*(i%2?1:-1)*(1+i*.3),rot*(i%2?1:-1)*(1+i*.3)+5.6);fx.stroke()}
+ fx.setLineDash([]);fx.globalAlpha=1;
+ if(on&&!rm)for(let i=0;i<20;i++){const a=rot*3+i*.314;fx.strokeStyle='rgba(255,255,255,.35)';fx.beginPath();fx.moveTo(c+Math.cos(a)*FS*.12,c+Math.sin(a)*FS*.12);fx.lineTo(c+Math.cos(a)*FS*.46,c+Math.sin(a)*FS*.46);fx.stroke()}
+ if(PT.length<(rm?20:70)&&(on||Math.random()<.15))PT.push({a:Math.random()*6.28,r:FS*.46,s:.5+Math.random()*1.5,c:Math.random()<.5?ca:cb});
+ for(const p of PT){p.a+=.03*p.s;p.r-=p.s*(on?2.4:.5);fx.fillStyle=p.c;fx.fillRect(c+Math.cos(p.a)*p.r,c+Math.sin(p.a)*p.r,2.5,2.5)}PT=PT.filter(p=>p.r>FS*.08);
+ fx.fillStyle='rgba(255,255,255,'+(.5+Math.sin(rot*6)*.3)+')';fx.beginPath();fx.arc(c,c,FS*.05*(on?1.6:1),0,7);fx.fill()}
+function pick(n){if(busy)return;if(!A)A=n;else if(!B)B=n;else{A=n;B=null}sfx('sel');renderSlots();renderLib()}
+function doForge(){if(!A||!B||busy)return;busy=true;on=true;sfx('forge');$('go').disabled=true;$('core').innerHTML='<b>FORGING...</b>';const a=A,b=B;setTimeout(()=>finish(a,b),st.set.rm?300:1200)}
+function finish(a,b){const r=combine(a,b),n=r.n,fb=!!r.cu;st.combos++;st.tried[key(a,b)]=1;const isNew=!st.found[n];
+ if(isNew){st.order++;st.found[n]={t:Date.now(),a,b,n:1,i:st.order};st.ns++;st.bns=Math.max(st.bns,st.ns);if(fb)st.stats.fb++}else{st.found[n].n++;st.ns=0}
+ const today=dk();let dailyDone=false;if(dailyTarget()===n&&st.daily.done!==today){st.daily.streak=st.daily.last===dk(-1)?st.daily.streak+1:1;st.daily.last=today;st.daily.done=today;dailyDone=true}
+ on=false;busy=false;A=B=null;$('core').innerHTML='<i class="pop">'+r.e+'</i><b>'+esc(n.toUpperCase())+'</b>';
+ $('res').textContent=isNew?'✨ '+n.toUpperCase()+' UNLOCKED!':n+' · created ×'+st.found[n].n;
+ const ms=[10,50,100,250,500,1000,2500,5000];if(isNew&&ms.includes(cnt()))toast('🎯 Milestone: '+fmt(cnt())+' discoveries!');
+ checkAch();save();renderAll();
+ if(isNew){sfx('new',rI(n));reveal(n)}else sfx('ok');
+ if(dailyDone){setTimeout(()=>{toast('📅 DAILY DISCOVERY COMPLETE — streak '+st.daily.streak);sfx('daily');checkAch();save();renderJ()},isNew?600:0)}}
+function reveal(n){const e=find(n),r=rI(n),R=RAR[r];const el=$('reveal');
+ el.innerHTML='<div class="box rv" style="border-color:'+R[2]+';box-shadow:0 0 60px '+R[2]+'66"><div class="nd">NEW DISCOVERY</div><div class="em">'+e.e+'</div><h3>'+esc(n.toUpperCase())+'</h3>'+rTag(n)+'<p>“'+esc(e.cu?'A strange creation from '+e.a+' and '+e.b+'.':(QT[n]||DESC(n,e.p[0],e.p[1])))+'”</p><div style="color:var(--go);font-weight:bold">+1 Discovery · #'+cnt()+'</div><div style="margin-top:10px"><button class="btn p" id="rvc">Continue</button>'+(r>=2?'<button class="btn" id="rvs">📣 SHARE DISCOVERY</button>':'')+'</div></div>';el.hidden=false;$('rvc').focus();
+ $('rvc').onclick=()=>{el.hidden=true};if($('rvs'))$('rvs').onclick=()=>{el.hidden=true;share(n)}}
+function share(n){const e=find(n),r=rI(n),txt='ELEMENT FORGE\n\n✨ NEW DISCOVERY\n\n'+e.e+' '+n.toUpperCase()+'\n\n'+RAR[r][0].toUpperCase()+'\n\nDiscovery #'+(st.found[n].i||cnt());
+ sheet('Share discovery','<canvas id="shc" width="600" height="380" style="width:100%;border-radius:14px"></canvas><div style="text-align:center;margin-top:8px"><button class="btn p" id="shcp">Copy / Share</button></div><p style="color:var(--mu);text-align:center;font-size:13px">Long-press the card to save the image.</p>');
+ const c=$('shc').getContext('2d'),g=c.createLinearGradient(0,0,600,380);g.addColorStop(0,'#050a26');g.addColorStop(1,'#2a0f5a');c.fillStyle=g;c.fillRect(0,0,600,380);c.strokeStyle=RAR[r][2];c.lineWidth=6;c.strokeRect(10,10,580,360);c.textAlign='center';c.fillStyle='#38e8ff';c.font='bold 26px sans-serif';c.fillText('E L E M E N T   F O R G E',300,60);c.fillStyle='#ffcf5a';c.font='20px sans-serif';c.fillText('✨ NEW DISCOVERY',300,95);c.font='96px serif';c.fillText(e.e,300,205);c.fillStyle='#fff';c.font='bold 40px sans-serif';c.fillText(n.toUpperCase(),300,265);c.fillStyle=RAR[r][2];c.font='bold 24px sans-serif';c.fillText(RAR[r][1]+' '+RAR[r][0].toUpperCase(),300,305);c.fillStyle='#8fa3c8';c.font='20px sans-serif';c.fillText('Discovery #'+(st.found[n].i||cnt()),300,345);
+ $('shcp').onclick=async()=>{st.stats.share++;checkAch();save();try{if(navigator.share){await navigator.share({text:txt});return}}catch(x){}try{await navigator.clipboard.writeText(txt);toast('Copied to clipboard')}catch(x){toast('Copy failed — screenshot the card instead')}}}
+// ---------- daily
+function dk(o){const d=new Date();d.setDate(d.getDate()+(o||0));return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()+''}
+const DL=REC.map(r=>r[2]).filter(n=>E[n].d>=2&&E[n].d<=4&&E[n].c!=='X');
+const dailyTarget=()=>DL[hash(dk())%DL.length];
+function dailySheet(){const t=dailyTarget(),e=E[t],done=st.daily.done===dk();sheet('📅 Daily discovery',done?'<div class="rv"><div class="em">'+e.e+'</div><h3>DAILY DISCOVERY COMPLETE</h3><p>'+esc(e.p[0])+' + '+esc(e.p[1])+' = '+esc(t)+'</p><b>Streak: '+st.daily.streak+' day'+(st.daily.streak===1?'':'s')+'</b></div>':'<div class="rv"><div class="nd" style="font-size:14px">TODAY\'S MYSTERY</div><div style="font-size:28px;margin:12px">??? + ??? = '+e.e+'</div><p>Forge the two elements that create this. Hint: '+CM[e.c][1]+' '+CM[e.c][2]+' · '+t.length+' letters · starts with “'+esc(t[0])+'”.<br>You may need to discover the ingredients first!</p><b>Current streak: '+st.daily.streak+'</b><div><button class="btn p" id="dgo">Start experimenting</button></div></div>');if($('dgo'))$('dgo').onclick=closeSheet}
+// ---------- sheets
+function codexSheet(cat,qs){qs=(qs||'').toLowerCase();const all=Object.keys(E).concat(Object.keys(st.cust)).filter(n=>(!cat||find(n).c===cat));const h='<input id="cq" placeholder="Search codex..." value="'+esc(qs)+'" style="width:100%;min-height:44px;border-radius:12px;border:1px solid var(--ln);background:#050a20;color:var(--fg);padding:0 12px;margin-bottom:8px"><div class="chips"><button class="chip" data-cx="">All</button>'+CATS.map(c=>'<button class="chip" data-cx="'+c[0]+'">'+c[1]+'</button>').join('')+'</div><p style="color:var(--mu)">'+(Object.keys(st.found).length-4)+' discovered of '+(Object.keys(E).length-4)+' crafted recipes (plus endless surprise creations)</p><div class="grid">'+all.filter(n=>!isBase(n)&&(!qs||(st.found[n]&&n.toLowerCase().includes(qs)))).map(n=>st.found[n]?'<button class="cell" data-d="'+esc(n)+'"><i>'+find(n).e+'</i>'+esc(n)+'<span style="color:'+RAR[rI(n)][2]+'">'+RAR[rI(n)][1]+' '+RAR[rI(n)][0]+'</span></button>':'<div class="cell lk"><i>❓</i>???<span>🔒 LOCKED</span></div>').join('')+'</div>';sheet('📖 Element Codex',h);
+ $('cq').oninput=e=>{codexSheet(cat,e.target.value);$('cq').focus()};$('shb').onclick=e=>{const b=e.target.closest('[data-cx]');if(b)codexSheet(b.dataset.cx,'')}}
+function histSheet(){const l=Object.keys(st.found).filter(k=>st.found[k].t).sort((a,b)=>st.found[b].t-st.found[a].t).slice(0,300);let last='',h='';const td=new Date().toDateString(),y=new Date(Date.now()-864e5).toDateString();
+ l.forEach(k=>{const d=new Date(st.found[k].t),ds=d.toDateString(),lb=ds===td?'Today':ds===y?'Yesterday':d.toLocaleDateString();if(lb!==last){h+='<h3 style="color:var(--go);margin:12px 0 4px">'+lb+'</h3>';last=lb}h+='<button class="chip" style="width:100%" data-d="'+esc(k)+'"><i>'+find(k).e+'</i>'+esc(k)+' <small>= '+esc(st.found[k].a)+' + '+esc(st.found[k].b)+'</small></button>'});sheet('🕒 Discovery history',h||'<p>No discoveries yet.</p>')}
+function achSheet(){sheet('🏆 Achievements ('+Object.keys(st.ach).length+'/'+ACH.length+')',ACH.map(a=>'<div class="ach'+(st.ach[a[0]]?'':' lk')+'"><i>'+(st.ach[a[0]]?a[1]:'🔒')+'</i><div><b>'+a[2]+'</b><br><small style="color:var(--mu)">'+a[3]+'</small></div></div>').join(''))}
+function setSheet(){const s=st.set;sheet('⚙️ Settings','<div class="ach"><label><input type="checkbox" id="o1" '+(s.snd?'checked':'')+'> 🔊 Sound effects</label></div><div class="ach"><label><input type="checkbox" id="o2" '+(s.mus?'checked':'')+'> 🎵 Music</label></div><div class="ach"><label>Volume <input type="range" id="o3" min="0" max="1" step=".05" value="'+s.vol+'"></label></div><div class="ach"><label><input type="checkbox" id="o4" '+(s.hc?'checked':'')+'> High contrast</label></div><div class="ach"><label><input type="checkbox" id="o5" '+(s.rm?'checked':'')+'> Reduced motion</label></div><div style="margin-top:14px"><button class="btn" id="o6" style="border-color:#ff4d6d;color:#ff8a9c">RESET ALL PROGRESS</button></div>');
+ $('o1').onchange=e=>{s.snd=+e.target.checked;save()};$('o2').onchange=e=>{s.mus=+e.target.checked;save();music()};$('o3').oninput=e=>{s.vol=+e.target.value;if(MG)MG.gain.value=s.vol;save()};$('o4').onchange=e=>{s.hc=+e.target.checked;apply();save()};$('o5').onchange=e=>{s.rm=+e.target.checked;apply();save()};
+ $('o6').onclick=()=>{$('shb').innerHTML='<h3>Reset everything?</h3><p>All discoveries, achievements and streaks will be deleted. This cannot be undone.</p><button class="btn" id="ry" style="border-color:#ff4d6d;color:#ff8a9c">Yes, delete all</button><button class="btn p" id="rn">Cancel</button>';$('rn').onclick=closeSheet;$('ry').onclick=()=>{try{localStorage.removeItem(KEY)}catch(e){}location.reload()}}}
+const apply=()=>{document.body.classList.toggle('hc',!!st.set.hc);document.body.classList.toggle('rm',!!st.set.rm)};
+// ---------- discovery map
+let mp={raf:0,s:1,ox:0,oy:0,pos:[],drag:null};
+function mapSheet(){sheet('🌌 Discovery map','<canvas id="mapc"></canvas><div style="text-align:center"><button class="btn" id="mz1" aria-label="Zoom in">＋</button><button class="btn" id="mz2" aria-label="Zoom out">－</button><button class="btn" id="mz3">Reset</button></div><p style="color:var(--mu);font-size:13px;text-align:center">Drag to pan · zoom to read names · tap a star to inspect it</p>');
+ const c=$('mapc'),ctx=c.getContext('2d');c.width=c.clientWidth*(devicePixelRatio||1);c.height=c.clientHeight*(devicePixelRatio||1);const D=devicePixelRatio||1;
+ const ang={Fire:0,Earth:1.57,Water:3.14,Air:4.71},P={};const names=Object.keys(st.found).sort((a,b)=>(find(a).d||0)-(find(b).d||0));
+ names.forEach(n=>{const e=find(n),f=st.found[n];let a=ang[n];if(a==null){const pa=ang[f.a]??0,pb=ang[f.b]??0;a=Math.atan2(Math.sin(pa)+Math.sin(pb),Math.cos(pa)+Math.cos(pb))+((hash(n)%1000)/1000-.5)*.45;ang[n]=a}const r=isBase(n)?38:70+(e.d||1)*50+(hash(n+'r')%30);P[n]={x:Math.cos(a)*r,y:Math.sin(a)*r,n}});
+ mp.pos=Object.values(P);mp.s=Math.min(1,c.clientWidth/900)*1.1;mp.ox=0;mp.oy=0;
+ const draw=()=>{ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height);ctx.setTransform(D*mp.s,0,0,D*mp.s,c.width/2+mp.ox*D,c.height/2+mp.oy*D);
+  ctx.lineWidth=1/mp.s;for(const n of names){const f=st.found[n];if(!f.a||!P[f.a]||!P[f.b])continue;ctx.strokeStyle=CM[find(n).c][3]+'44';ctx.beginPath();ctx.moveTo(P[f.a].x,P[f.a].y);ctx.lineTo(P[n].x,P[n].y);ctx.lineTo(P[f.b].x,P[f.b].y);ctx.stroke()}
+  ctx.textAlign='center';for(const p of mp.pos){const e=find(p.n);ctx.fillStyle=CM[e.c][3];ctx.beginPath();ctx.arc(p.x,p.y,isBase(p.n)?8:4,0,7);ctx.fill();if(mp.s>.55){ctx.font=(mp.s>1?14:12)/mp.s*(mp.s>.9?1:1.4)+'px sans-serif';ctx.fillText(e.e,p.x,p.y-8/mp.s);if(mp.s>1.1){ctx.fillStyle='#cfe';ctx.font=11/mp.s+'px sans-serif';ctx.fillText(p.n,p.x,p.y+14/mp.s)}}}
+  mp.raf=requestAnimationFrame(draw)};draw();
+ c.onpointerdown=e=>{mp.drag={x:e.clientX,y:e.clientY,m:0};c.setPointerCapture(e.pointerId)};c.onpointermove=e=>{if(!mp.drag)return;const dx=e.clientX-mp.drag.x,dy=e.clientY-mp.drag.y;if(Math.abs(dx)+Math.abs(dy)>3)mp.drag.m=1;mp.ox+=dx;mp.oy+=dy;mp.drag.x=e.clientX;mp.drag.y=e.clientY};
+ c.onpointerup=e=>{if(mp.drag&&!mp.drag.m){const r=c.getBoundingClientRect(),mx=(e.clientX-r.left-r.width/2-mp.ox)/mp.s,my=(e.clientY-r.top-r.height/2-mp.oy)/mp.s;let b=null,bd=18/mp.s;for(const p of mp.pos){const d=Math.hypot(p.x-mx,p.y-my);if(d<bd){bd=d;b=p.n}}if(b){stopMap();sheet(b,card(b))}}mp.drag=null};
+ c.onwheel=e=>{e.preventDefault();mp.s=Math.max(.2,Math.min(4,mp.s*(e.deltaY<0?1.15:.87)))};
+ $('mz1').onclick=()=>mp.s=Math.min(4,mp.s*1.3);$('mz2').onclick=()=>mp.s=Math.max(.2,mp.s/1.3);$('mz3').onclick=()=>{mp.s=Math.min(1,c.clientWidth/900)*1.1;mp.ox=mp.oy=0}}
+function stopMap(){cancelAnimationFrame(mp.raf)}
+// ---------- events
+$('libl').addEventListener('click',e=>{const b=e.target.closest('button[data-n]');if(b)pick(b.dataset.n)});
+$('libl').addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.c&&!q)openC[d.dataset.c]=d.open?1:0},true);
+$('q').oninput=e=>{q=e.target.value.toLowerCase().trim();renderLib()};
+$('sa').onclick=()=>{if(!busy){A=null;renderSlots();renderLib()}};$('sb').onclick=()=>{if(!busy){B=null;renderSlots();renderLib()}};$('clr').onclick=()=>{if(!busy){A=B=null;renderSlots();renderLib()}};
+$('go').onclick=doForge;
+$('sur').onclick=()=>{if(busy)return;const ns=Object.keys(st.found);let a,b;for(let i=0;i<40;i++){a=ns[Math.floor(Math.random()*ns.length)];b=ns[Math.floor(Math.random()*ns.length)];if(!st.tried[key(a,b)])break}A=a;B=b;st.stats.sur++;renderSlots();renderLib();sfx('sel');doForge()};
+document.addEventListener('click',e=>{const d=e.target.closest('[data-d]');if(d&&d.dataset.d){sheet(d.dataset.d,card(d.dataset.d));return}const s=e.target.closest('nav [data-s]');if(s){({codex:()=>codexSheet(),map:mapSheet,hist:histSheet,ach:achSheet,daily:dailySheet,set:setSheet})[s.dataset.s]()}});
+$('navj').onclick=()=>sheet('📊 Journal',jHTML());$('shx').onclick=closeSheet;
+addEventListener('keydown',e=>{if(e.key==='Escape'){$('reveal').hidden=true;closeSheet()}});
+$('start').onclick=()=>{$('home').style.display='none';au();if(st.set.mus)music();fit();renderAll();$('core').innerHTML='<i>⚡</i><b>SELECT TWO</b>';sfx('sel')};
+addEventListener('resize',fit);document.addEventListener('visibilitychange',()=>{});
+apply();fit();renderAll();forgeLoop();
+if(cnt()>0)$('start').textContent='⚡ CONTINUE FORGING';
+</script></body></html>
