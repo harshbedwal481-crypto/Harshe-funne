@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Who is the Imposter?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151c2e;
+      --accent: #ff4757;
+      --text: #f1f2f6;
+      --crew: #2ed573;
+      --border: #2f3542;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .status-panel {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--accent);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .status-panel strong {
+      color: #ffa502;
+    }
+
+    .crew-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .crew-card {
+      background: #1e273e;
+      padding: 14px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .crew-card:hover {
+      border-color: #5352ed;
+      transform: translateY(-2px);
+    }
+
+    .crew-card.selected {
+      border-color: var(--accent);
+      background: #281e2e;
+    }
+
+    .crew-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .crew-name {
+      font-weight: bold;
+    }
+
+    .crew-statement {
+      font-size: 0.85rem;
+      color: #a4b0be;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .score {
+      font-weight: 600;
+      color: #70a1ff;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+
+    #result-msg {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Who is the Imposter?</h1>
+      <p style="color: #747d8c; font-size: 0.9rem;">Find the liar based on station sensor data</p>
+    </header>
+
+    <div class="status-panel" id="incident-log">
+      Loading sensors...
+    </div>
+
+    <div class="crew-list" id="crew-container"></div>
+
+    <div class="action-row">
+      <span class="score" id="score-display">Score: 0</span>
+      <button id="vote-btn" disabled>Confirm Ejection</button>
+    </div>
+
+    <div id="result-msg"></div>
+  </div>
+
+  <script>
+    const COLORS = [
+      { name: "Red", hex: "#ff4757" },
+      { name: "Blue", hex: "#1e90ff" },
+      { name: "Green", hex: "#2ed573" },
+      { name: "Yellow", hex: "#ffa502" }
+    ];
+
+    const SCENARIOS = [
+      {
+        log: "CRITICAL: Oxygen levels dropped in MedBay. Security cameras were fully operational.",
+        innocentTasks: [
+          "I was swiping my card in Admin.",
+          "I saw Green on cams running to Weapons.",
+          "I was refueling the engine in Lower Engine."
+        ],
+        imposterTasks: [
+          "I was fixing wires in the dark because cameras were offline.",
+          "I was doing medical scans in MedBay the whole time."
+        ]
+      },
+      {
+        log: "CRITICAL: Power blacked out across the ship. Shields were untouched and active.",
+        innocentTasks: [
+          "I was stumbling in Navigation with a flashlight.",
+          "I went straight to Electrical to fix the lights.",
+          "I stayed put in Reactor until the emergency meeting."
+        ],
+        imposterTasks: [
+          "I was recharging the Shields since they dropped to 0%.",
+          "I didn't notice any blackout from Electrical."
+        ]
+      },
+      {
+        log: "CRITICAL: Communications were jammed from Navigation. Admin door remained locked.",
+        innocentTasks: [
+          "I was trying to report the comms glitch from Office.",
+          "I saw Red waiting outside the locked Admin door.",
+          "I was busy emptying garbage into the chute."
+        ],
+        imposterTasks: [
+          "I just walked out of Admin through the unlocked sliding doors.",
+          "I called Earth on the phone; everything seemed normal."
+        ]
+      }
+    ];
+
+    let score = 0;
+    let selectedCrewIndex = null;
+    let imposterIndex = null;
+    let roundResolved = false;
+
+    function startNewRound() {
+      roundResolved = false;
+      selectedCrewIndex = null;
+      document.getElementById('result-msg').textContent = "";
+      document.getElementById('vote-btn').textContent = "Confirm Ejection";
+      document.getElementById('vote-btn').disabled = true;
+
+      const scenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+      document.getElementById('incident-log').innerHTML = `<strong>Ship Log:</strong> ${scenario.log}`;
+
+      imposterIndex = Math.floor(Math.random() * COLORS.length);
+      const imposterLie = scenario.imposterTasks[Math.floor(Math.random() * scenario.imposterTasks.length)];
+      
+      let innocentPool = [...scenario.innocentTasks].sort(() => 0.5 - Math.random());
+
+      const container = document.getElementById('crew-container');
+      container.innerHTML = "";
+
+      COLORS.forEach((color, idx) => {
+        const isImposter = (idx === imposterIndex);
+        const statement = isImposter ? imposterLie : innocentPool.pop();
+
+        const card = document.createElement('div');
+        card.className = 'crew-card';
+        card.onclick = () => selectCrew(idx);
+        card.innerHTML = `
+          <div class="crew-header">
+            <span class="avatar" style="background-color: ${color.hex}"></span>
+            <span class="crew-name">${color.name}</span>
+          </div>
+          <div class="crew-statement">"${statement}"</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectCrew(index) {
+      if (roundResolved) return;
+      selectedCrewIndex = index;
+
+      const cards = document.querySelectorAll('.crew-card');
+      cards.forEach((card, idx) => {
+        card.classList.toggle('selected', idx === index);
+      });
+
+      document.getElementById('vote-btn').disabled = false;
+    }
+
+    document.getElementById('vote-btn').addEventListener('click', () => {
+      if (roundResolved) {
+        startNewRound();
+        return;
+      }
+
+      roundResolved = true;
+      const resultMsg = document.getElementById('result-msg');
+      const cards = document.querySelectorAll('.crew-card');
+
+      if (selectedCrewIndex === imposterIndex) {
+        score++;
+        resultMsg.style.color = "var(--crew)";
+        resultMsg.textContent = `Correct! ${COLORS[imposterIndex].name} was the Imposter!`;
+      } else {
+        resultMsg.style.color = "var(--accent)";
+        resultMsg.textContent = `Defeat! ${COLORS[selectedCrewIndex].name} was innocent. ${COLORS[imposterIndex].name} was the Imposter.`;
+      }
+
+      cards[imposterIndex].style.borderColor = "var(--crew)";
+      document.getElementById('score-display').textContent = `Score: ${score}`;
+      document.getElementById('vote-btn').textContent = "Next Round";
+      document.getElementById('vote-btn').disabled = false;
+    });
+
+    startNewRound();
+  </script>
+</body>
+</html>

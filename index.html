@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080a14">
+  <meta name="description" content="HARSH.FUN — Play. Discover. Have Fun.">
+  <title>HARSH.FUN — Play. Discover. Have Fun.</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="grid-overlay"></div>
+  <div id="particles" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="HARSH.FUN Home">
+      <span class="brand-mark"><span></span><span></span><span></span></span>
+      <span>harsh<span>.fun</span></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="nav-link active" href="#home">HOME</a>
+      <a class="nav-link" href="#games">GAMES</a>
+      <a class="nav-link" href="#new">NEW</a>
+      <a class="nav-link" href="#about">ABOUT</a>
+    </nav>
+
+    <button class="search-toggle" id="searchToggle" aria-label="Open search" title="Search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg>
+    </button>
+  </header>
+
+  <div class="search-panel" id="searchPanel">
+    <div class="search-inner">
+      <label for="gameSearch">SEARCH GAMES</label>
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg>
+        <input id="gameSearch" type="search" placeholder="Search a game..." autocomplete="off">
+        <button id="clearSearch" aria-label="Clear search">×</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="hero section" id="home">
+      <div class="hero-copy">
+        <div class="eyebrow"><i></i> INDEPENDENT BROWSER GAMES</div>
+        <h1>WELCOME TO <strong>HARSH<span>.FUN</span></strong></h1>
+        <p class="hero-subtitle">Play. Discover. Have Fun.</p>
+        <p class="hero-text">A hand-built arcade hub packed with quick challenges, strange mysteries and games made to keep you playing.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#games">EXPLORE GAMES <span>→</span></a>
+          <a class="btn btn-ghost" href="#about">ABOUT THE HUB</a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <div class="hero-core">
+          <div class="core-ring"></div>
+          <span class="core-text">H<br>F</span>
+        </div>
+        <div class="float-chip chip-1">5 GAMES</div>
+        <div class="float-chip chip-2">100% OFFLINE</div>
+        <div class="float-chip chip-3">NO LOGIN</div>
+      </div>
+      <div class="scroll-cue">SCROLL TO EXPLORE <span>↓</span></div>
+    </section>
+
+    <section class="section games-section" id="games">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow"><i></i> THE ARCADE</div>
+          <h2>CHOOSE YOUR <span>GAME</span></h2>
+        </div>
+        <p>Five original browser experiences. Pick a challenge and jump straight in.</p>
+      </div>
+
+      <article class="featured-card" id="new">
+        <div class="featured-art" aria-hidden="true">
+          <div class="gravity-orb"></div>
+          <div class="gravity-line line-a"></div>
+          <div class="gravity-line line-b"></div>
+          <div class="gravity-dot dot-a"></div>
+          <div class="gravity-dot dot-b"></div>
+        </div>
+        <div class="featured-content">
+          <div class="featured-label">FEATURED GAME <span>◆</span></div>
+          <h3>GRAVITY <em>FLIPS</em></h3>
+          <p>FLIP GRAVITY. ESCAPE EVERYTHING.</p>
+          <a class="btn btn-primary" href="games/gravity-flips.html">PLAY NOW <span>→</span></a>
+        </div>
+        <div class="featured-number">04</div>
+      </article>
+
+      <div class="filter-row" aria-label="Game categories">
+        <button class="filter active" data-category="all">ALL</button>
+        <button class="filter" data-category="action">ACTION</button>
+        <button class="filter" data-category="puzzle">PUZZLE</button>
+        <button class="filter" data-category="strategy">STRATEGY</button>
+        <button class="filter" data-category="arcade">ARCADE</button>
+        <button class="filter" data-category="mystery">MYSTERY</button>
+      </div>
+
+      <div class="game-grid" id="gameGrid">
+        <article class="game-card" data-category="strategy" data-title="build-a-country">
+          <div class="card-top">
+            <div class="game-icon icon-1"><span>▦</span></div>
+            <span class="card-tag">STRATEGY</span>
+          </div>
+          <h3>Build-a-Country</h3>
+          <p>Build your own nation, manage resources and shape its future.</p>
+          <a class="play-link" href="games/build-a-country.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="strategy" data-title="chess realms">
+          <div class="card-top">
+            <div class="game-icon icon-2"><span>♞</span></div>
+            <span class="card-tag">STRATEGY</span>
+          </div>
+          <h3>Chess Realms</h3>
+          <p>Think ahead, control the board and conquer rival realms.</p>
+          <a class="play-link" href="games/chess-realms.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="puzzle" data-title="element forge">
+          <div class="card-top">
+            <div class="game-icon icon-3"><span>✦</span></div>
+            <span class="card-tag">PUZZLE</span>
+          </div>
+          <h3>Element Forge</h3>
+          <p>Combine powerful elements and discover unexpected creations.</p>
+          <a class="play-link" href="games/element-forge.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="mystery" data-title="escape the ai">
+          <div class="card-top">
+            <div class="game-icon icon-4"><span>⌁</span></div>
+            <span class="card-tag">MYSTERY</span>
+          </div>
+          <h3>Escape the AI</h3>
+          <p>Outsmart the system, find the exit and escape before it adapts.</p>
+          <a class="play-link" href="games/escape-the-ai.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="strategy" data-title="last shop on earth">
+          <div class="card-top">
+            <div class="game-icon icon-5"><span>◇</span></div>
+            <span class="card-tag">STRATEGY</span>
+          </div>
+          <h3>Last Shop on Earth</h3>
+          <p>Trade, survive and keep the final shop in business.</p>
+          <a class="play-link" href="games/last-shop-on-earth.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="action" data-title="lava chaos">
+          <div class="card-top">
+            <div class="game-icon icon-6"><span>△</span></div>
+            <span class="card-tag">ACTION</span>
+          </div>
+          <h3>Lava Chaos</h3>
+          <p>Keep moving as the arena fills with unstoppable lava.</p>
+          <a class="play-link" href="games/lava-chaos.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="arcade" data-title="rps arena">
+          <div class="card-top">
+            <div class="game-icon icon-7"><span>◈</span></div>
+            <span class="card-tag">ARCADE</span>
+          </div>
+          <h3>RPS Arena</h3>
+          <p>Enter the arena and master rock, paper, scissors.</p>
+          <a class="play-link" href="games/rps-arena.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="arcade" data-title="spend hardik's money">
+          <div class="card-top">
+            <div class="game-icon icon-8"><span>$</span></div>
+            <span class="card-tag">ARCADE</span>
+          </div>
+          <h3>Spend Hardik's Money</h3>
+          <p>A fast and funny spending challenge with ridiculous choices.</p>
+          <a class="play-link" href="games/spend-hardiks-money.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="action" data-title="steal the gold">
+          <div class="card-top">
+            <div class="game-icon icon-9"><span>◆</span></div>
+            <span class="card-tag">ACTION</span>
+          </div>
+          <h3>Steal the Gold</h3>
+          <p>Grab the treasure, avoid danger and make your escape.</p>
+          <a class="play-link" href="games/steal-the-gold.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="mystery" data-title="the last light">
+          <div class="card-top">
+            <div class="game-icon icon-10"><span>✦</span></div>
+            <span class="card-tag">MYSTERY</span>
+          </div>
+          <h3>The Last Light</h3>
+          <p>Protect the final light while darkness closes in.</p>
+          <a class="play-link" href="games/last-light.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="arcade" data-title="tic-tac-toe">
+          <div class="card-top">
+            <div class="game-icon icon-11"><span>×</span></div>
+            <span class="card-tag">ARCADE</span>
+          </div>
+          <h3>Tic-Tac-Toe</h3>
+          <p>Classic Xs and Os with a clean HARSH.FUN twist.</p>
+          <a class="play-link" href="games/tic-tac-toe.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="arcade" data-title="time breaker">
+          <div class="card-top">
+            <div class="game-icon icon-12"><span>◷</span></div>
+            <span class="card-tag">ARCADE</span>
+          </div>
+          <h3>Time Breaker</h3>
+          <p>React at the perfect moment and break your best time.</p>
+          <a class="play-link" href="games/time-breaker.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="action" data-title="time rush">
+          <div class="card-top">
+            <div class="game-icon icon-13"><span>»</span></div>
+            <span class="card-tag">ACTION</span>
+          </div>
+          <h3>Time Rush</h3>
+          <p>Race against the clock through a rapid-fire challenge.</p>
+          <a class="play-link" href="games/time-rush.html">PLAY NOW <span>↗</span></a>
+        </article>
+        <article class="game-card" data-category="arcade" data-title="gravity flips">
+          <div class="card-top">
+            <div class="game-icon icon-14"><span>↕</span></div>
+            <span class="card-tag">ARCADE</span>
+          </div>
+          <h3>Gravity Flips</h3>
+          <p>Flip gravity and survive a world where up and down keep changing.</p>
+          <a class="play-link" href="games/gravity-flips.html">PLAY NOW <span>↗</span></a>
+        </article>
+      </div>
+
+      <div class="empty-state" id="emptyState">NO GAMES FOUND</div>
+    </section>
+
+    <section class="stats-section section">
+      <div class="stats-grid">
+        <div class="stat-card"><strong data-count="14">0</strong><span>+ GAMES</span></div>
+        <div class="stat-card"><strong data-count="100">0</strong><span>% OFFLINE</span></div>
+        <div class="stat-card"><strong>FREE</strong><span>TO PLAY</span></div>
+        <div class="stat-card"><strong>NO</strong><span>LOGIN REQUIRED</span></div>
+      </div>
+    </section>
+
+    <section class="about section" id="about">
+      <div class="about-panel">
+        <div class="about-badge">HF</div>
+        <div>
+          <div class="eyebrow"><i></i> ABOUT HARSH.FUN</div>
+          <h2>MADE TO BE <span>PLAYED.</span></h2>
+          <p>HARSH.FUN is an original collection of fun browser games designed to work directly in your browser without requiring an account or internet connection.</p>
+          <p class="muted">Everything on this hub is built with HTML, CSS and vanilla JavaScript — simple, fast and ready whenever you are.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <a class="brand footer-brand" href="#home"><span class="brand-mark"><span></span><span></span><span></span></span><span>harsh<span>.fun</span></span></a>
+      <p>Play. Discover. Have Fun.</p>
+    </div>
+    <div class="footer-links">
+      <a href="#home">Home</a>
+      <a href="#games">Games</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="copyright">© 2026 Harsh.fun</div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
